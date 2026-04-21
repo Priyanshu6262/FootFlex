@@ -88,7 +88,7 @@ const ProductDetails = () => {
             {/* Main Image */}
             <motion.div 
               layoutId={`product-image-${product.id}`}
-              className="flex-1 bg-gradient-to-br from-[#18181b] to-background-card rounded-[2.5rem] border border-[#27272a] relative flex items-center justify-center p-8 aspect-square md:aspect-auto group overflow-hidden"
+              className="flex-1 bg-gradient-to-br from-[#18181b] to-background-card rounded-[2.5rem] border border-[#27272a] relative flex items-center justify-center p-8 md:max-h-[450px] aspect-square md:aspect-auto group overflow-hidden"
             >
                {/* 3D Glass overlay */}
                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />

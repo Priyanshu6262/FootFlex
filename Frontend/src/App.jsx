@@ -6,6 +6,7 @@ import Women from './pages/Women';
 import Kids from './pages/Kids';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
+import ProductDetails from './pages/ProductDetails';
 import Footer from './components/Footer';
 import { FilterProvider } from './context/FilterContext';
 
@@ -28,6 +29,7 @@ function App() {
                   <Route path="/wishlist" element={<div className="h-screen flex items-center justify-center text-3xl">Wishlist Coming Soon</div>} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/admin" element={<AdminDashboard />} />
+                  <Route path="/product/:id" element={<ProductDetails />} />
                 </Routes>
               </main>
               <Footer />

@@ -79,7 +79,7 @@ const ProductCard = ({ product }) => {
       </div>
 
       {/* Image Container */}
-      <Link to={`/product/${product.id}`} className="block relative h-64 mb-6 rounded-2xl overflow-hidden bg-gradient-to-b from-background-main to-transparent flex items-center justify-center">
+      <Link to={`/product/${product.id}`} className="block relative h-56 mb-6 rounded-2xl overflow-hidden bg-gradient-to-b from-background-main to-transparent flex items-center justify-center">
         {/* Background glow for image */}
         <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         
