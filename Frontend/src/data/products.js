@@ -1,0 +1,197 @@
+export const products = [
+  {
+    id: 1,
+    name: "AeroGlide Elite",
+    price: 189.99,
+    category: "Running",
+    rating: 4.8,
+    reviews: 124,
+    image: "/images/products/product1.png",
+    isNew: true,
+    discount: 0,
+    colors: ["bg-blue-500", "bg-black", "bg-white"],
+    colorNames: ["Blue", "Black", "White"],
+    sizes: [7, 8, 9, 10, 11]
+  },
+  {
+    id: 2,
+    name: "Nova Lux Trainer",
+    price: 145.00,
+    category: "Casual",
+    rating: 4.9,
+    reviews: 89,
+    image: "/images/products/product2.png",
+    isNew: false,
+    discount: 15,
+    colors: ["bg-rose-400", "bg-white", "bg-gray-200"],
+    colorNames: ["Red", "White", "Grey"],
+    sizes: [6, 7, 8]
+  },
+  {
+    id: 3,
+    name: "Court King Pro X",
+    price: 210.00,
+    category: "Sports",
+    rating: 4.7,
+    reviews: 215,
+    image: "/images/products/product3.png",
+    isNew: true,
+    discount: 0,
+    colors: ["bg-black", "bg-yellow-500"],
+    colorNames: ["Black"],
+    sizes: [9, 10, 11]
+  },
+  {
+    id: 4,
+    name: "TerraTrek Explorer",
+    price: 165.50,
+    category: "Training",
+    rating: 4.6,
+    reviews: 56,
+    image: "/images/products/product4.png",
+    isNew: false,
+    discount: 25,
+    colors: ["bg-green-700", "bg-orange-500", "bg-black"],
+    colorNames: ["Green", "Black"],
+    sizes: [8, 9, 10]
+  },
+  {
+    id: 5,
+    name: "ZoomKids Spark",
+    price: 85.00,
+    category: "Sneakers",
+    rating: 4.9,
+    reviews: 312,
+    image: "/images/products/product5.png",
+    isNew: true,
+    discount: 10,
+    colors: ["bg-lime-500", "bg-orange-500", "bg-blue-400"],
+    colorNames: ["Green", "Blue"],
+    sizes: [6, 7]
+  },
+  {
+    id: 6,
+    name: "Velocity Sprint",
+    price: 150.00,
+    category: "Running",
+    rating: 4.5,
+    reviews: 88,
+    image: "/images/products/product1.png",
+    isNew: false,
+    discount: 20,
+    colors: ["bg-white", "bg-black"],
+    colorNames: ["White", "Black"],
+    sizes: [8, 9, 10, 11]
+  },
+  {
+    id: 7,
+    name: "Midnight Stealth",
+    price: 195.00,
+    category: "Formal",
+    rating: 4.8,
+    reviews: 92,
+    image: "/images/products/product2.png",
+    isNew: true,
+    discount: 0,
+    colors: ["bg-black", "bg-gray-800"],
+    colorNames: ["Black", "Grey"],
+    sizes: [9, 10, 11]
+  },
+  {
+    id: 8,
+    name: "Urban Kicks",
+    price: 120.00,
+    category: "Casual",
+    rating: 4.3,
+    reviews: 45,
+    image: "/images/products/product3.png",
+    isNew: false,
+    discount: 30,
+    colors: ["bg-gray-300", "bg-blue-300"],
+    colorNames: ["Grey", "Blue"],
+    sizes: [7, 8, 9]
+  },
+  {
+    id: 9,
+    name: "Alpha Power Lift",
+    price: 220.00,
+    category: "Training",
+    rating: 4.9,
+    reviews: 310,
+    image: "/images/products/product4.png",
+    isNew: true,
+    discount: 0,
+    colors: ["bg-red-600", "bg-black"],
+    colorNames: ["Red", "Black"],
+    sizes: [10, 11]
+  },
+  {
+    id: 10,
+    name: "Retro High Tops",
+    price: 135.00,
+    category: "Sneakers",
+    rating: 4.7,
+    reviews: 142,
+    image: "/images/products/product5.png",
+    isNew: false,
+    discount: 0,
+    colors: ["bg-white", "bg-red-500"],
+    colorNames: ["White", "Red"],
+    sizes: [7, 8, 9, 10]
+  },
+  {
+    id: 11,
+    name: "Marathon Pro",
+    price: 175.99,
+    category: "Running",
+    rating: 4.6,
+    reviews: 198,
+    image: "/images/products/product1.png",
+    isNew: false,
+    discount: 10,
+    colors: ["bg-orange-400", "bg-white"],
+    colorNames: ["White"],
+    sizes: [8, 9, 10]
+  },
+  {
+    id: 12,
+    name: "Executive Loafer",
+    price: 250.00,
+    category: "Formal",
+    rating: 5.0,
+    reviews: 21,
+    image: "/images/products/product2.png",
+    isNew: true,
+    discount: 5,
+    colors: ["bg-black"],
+    colorNames: ["Black"],
+    sizes: [9, 10]
+  }
+];
+
+export const categories = [
+  {
+    id: "mens",
+    name: "Men's Selection",
+    image: "/images/hero-shoe.png",
+    desc: "Engineered for performance."
+  },
+  {
+    id: "womens",
+    name: "Women's Collection",
+    image: "/images/products/product2.png",
+    desc: "Uncompromised style."
+  },
+  {
+    id: "kids",
+    name: "Kids Playground",
+    image: "/images/products/product5.png",
+    desc: "Durability meets fun."
+  },
+  {
+    id: "sports",
+    name: "Pro Sports",
+    image: "/images/products/product3.png",
+    desc: "Dominate the game."
+  }
+];
