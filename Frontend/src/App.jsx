@@ -5,6 +5,7 @@ import Men from './pages/Men';
 import Women from './pages/Women';
 import Kids from './pages/Kids';
 import Login from './pages/Login';
+import AdminDashboard from './pages/AdminDashboard';
 import Footer from './components/Footer';
 import { FilterProvider } from './context/FilterContext';
 
@@ -14,7 +15,8 @@ function App() {
       <Router>
         <Routes>
           {/* Standalone pages — no Navbar/Footer */}
-          <Route path="/login" element={<Login />} />
+          {/* <Route path="/login" element={<Login />} /> */}
+
 
           {/* Main layout pages */}
           <Route path="/*" element={
@@ -28,6 +30,8 @@ function App() {
                   <Route path="/kids" element={<Kids />} />
                   <Route path="/cart" element={<div className="h-screen flex items-center justify-center text-3xl">Cart Coming Soon</div>} />
                   <Route path="/wishlist" element={<div className="h-screen flex items-center justify-center text-3xl">Wishlist Coming Soon</div>} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/admin" element={<AdminDashboard />} />
                 </Routes>
               </main>
               <Footer />
