@@ -5,10 +5,12 @@ import Men from './pages/Men';
 import Women from './pages/Women';
 import Kids from './pages/Kids';
 import Footer from './components/Footer';
+import { FilterProvider } from './context/FilterContext';
 
 function App() {
   return (
-    <Router>
+    <FilterProvider>
+      <Router>
       <div className="min-h-screen flex flex-col bg-background-main selection:bg-primary/30">
         <Navbar />
         <main className="flex-grow pt-20"> {/* pt-20 to account for fixed navbar */}
@@ -25,6 +27,7 @@ function App() {
         <Footer />
       </div>
     </Router>
+    </FilterProvider>
   );
 }
 
