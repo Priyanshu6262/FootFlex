@@ -1,5 +1,6 @@
-import { Heart, ShoppingBag, Eye, Star } from 'lucide-react';
+import { Heart, Eye, Star } from 'lucide-react';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import AddToCartButton from './AddToCartButton';
 
 const ProductCard = ({ product }) => {
   // 3D Tilt Effect variables
@@ -103,7 +104,7 @@ const ProductCard = ({ product }) => {
         
         <h3 className="text-white font-bold text-lg mb-4 truncate">{product.name}</h3>
         
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex flex-col">
             {product.discount > 0 ? (
               <>
@@ -118,9 +119,7 @@ const ProductCard = ({ product }) => {
             )}
           </div>
           
-          <button className="bg-white text-black hover:bg-primary hover:text-white rounded-xl p-3 shadow-lg transition-all duration-300 group-hover:scale-110 active:scale-95">
-            <ShoppingBag size={20} className="fill-current pointer-events-none" />
-          </button>
+          <AddToCartButton product={product} />
         </div>
       </div>
     </motion.div>
