@@ -3,12 +3,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, Heart, Menu, X, ChevronRight, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AccountDropdown from './AccountDropdown';
+import { useCart } from '../context/CartContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const location = useLocation();
+  const { cartCount } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -89,9 +91,11 @@ const Navbar = () => {
           </Link>
           <Link to="/cart" className="text-text-secondary hover:text-white transition-colors relative group">
             <ShoppingBag size={20} />
-            <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-background-main group-hover:scale-110 transition-transform">
-              2
-            </span>
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-background-main group-hover:scale-110 transition-transform">
+                {cartCount}
+              </span>
+            )}
           </Link>
         </div>
 
@@ -156,7 +160,11 @@ const Navbar = () => {
                <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2 text-text-secondary hover:text-primary transition-colors relative">
                  <div className="relative">
                     <ShoppingBag size={24} />
-                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                        {cartCount}
+                      </span>
+                    )}
                  </div>
                  <span className="text-xs">Cart</span>
                </Link>

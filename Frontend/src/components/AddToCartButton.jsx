@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Check, Sparkles } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
-const AddToCartButton = ({ product }) => {
+const AddToCartButton = ({ product, size, color }) => {
+  const { addToCart } = useCart();
   const [state, setState] = useState('idle'); // idle | adding | added
   const [particles, setParticles] = useState([]);
 
@@ -18,6 +20,7 @@ const AddToCartButton = ({ product }) => {
 
     setState('adding');
     setTimeout(() => {
+      addToCart(product, size || product.sizes[0], color || product.colors[0]);
       setState('added');
       setTimeout(() => {
         setState('idle');

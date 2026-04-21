@@ -90,7 +90,7 @@ const ProductDetails = () => {
               {/* Main Image */}
               <motion.div 
                 layoutId={`product-image-${product.id}`}
-                className="bg-gradient-to-br from-[#18181b] to-background-card rounded-[2.5rem] border border-[#27272a] relative flex items-center justify-center p-8 md:max-h-[450px] aspect-square md:aspect-auto group overflow-hidden"
+                className="bg-gradient-to-br from-[#18181b] to-background-card rounded-[2.5rem] border border-[#27272a] relative flex items-center justify-center p-8 md:max-h-[450px] aspect-square group overflow-hidden"
               >
                  {/* 3D Glass overlay */}
                  <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
@@ -116,21 +116,21 @@ const ProductDetails = () => {
                  </button>
               </motion.div>
 
-              {/* Extra Image Card (Fills space under the reduced main image) */}
-              <div className="hidden md:flex flex-1 min-h-[160px] bg-background-card rounded-[2.5rem] border border-border-accent relative overflow-hidden group">
+              {/* Extra Image Card (Matches main image size) */}
+              <div className="hidden md:flex bg-background-card rounded-[2.5rem] border border-border-accent relative overflow-hidden group aspect-square md:max-h-[450px]">
                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
                  <img 
                    src="/images/hero-shoe.png" 
                    alt="Lifestyle View" 
                    className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-80 transition-all duration-700 blur-[2px] group-hover:blur-0" 
                  />
-                 <div className="relative z-20 p-6 flex flex-col justify-end h-full">
-                    <div className="flex items-center gap-2 mb-1 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                 <div className="relative z-20 p-8 flex flex-col justify-end h-full w-full">
+                    <div className="flex items-center gap-2 mb-2 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                       <span className="w-8 h-px bg-primary inline-block" />
                       <span className="text-primary text-xs font-bold uppercase tracking-wider">Premium Tech</span>
                     </div>
-                    <h3 className="text-white font-black uppercase tracking-widest text-xl drop-shadow-md">Engineered for Excellence</h3>
-                    <p className="text-[#d4d4d8] text-sm font-medium drop-shadow mt-1">Discover the materials behind {product.name}</p>
+                    <h3 className="text-white font-black uppercase tracking-widest text-2xl drop-shadow-xl mb-1">Engineered for Excellence</h3>
+                    <p className="text-[#d4d4d8] font-medium drop-shadow-md">Discover the materials behind {product.name}</p>
                  </div>
               </div>
             </div>
@@ -214,7 +214,7 @@ const ProductDetails = () => {
               <div className="h-14 w-full md:w-80">
                 {/* Wrapping AddToCart to stretch */}
                 <div className="[&>div]:w-full [&_button]:w-full [&_button]:h-14 [&_button]:text-base">
-                   <AddToCartButton product={product} />
+                   <AddToCartButton product={product} size={selectedSize} color={selectedColor} />
                 </div>
               </div>
             </div>
