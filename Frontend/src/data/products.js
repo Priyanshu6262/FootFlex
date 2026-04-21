@@ -178,6 +178,66 @@ export const products = [
     colors: ["bg-black"],
     colorNames: ["Black"],
     sizes: [9, 10]
+  },
+  {
+    id: 13,
+    name: "Tiny Strider",
+    price: 65.00,
+    category: "Running",
+    rating: 4.9,
+    reviews: 421,
+    image: "/images/products/product5.png",
+    isNew: true,
+    discount: 5,
+    gender: "Kids",
+    colors: ["bg-blue-500", "bg-white"],
+    colorNames: ["Blue", "White"],
+    sizes: [6, 7]
+  },
+  {
+    id: 14,
+    name: "Playground Pro",
+    price: 55.00,
+    category: "Sports",
+    rating: 4.7,
+    reviews: 189,
+    image: "/images/products/product4.png",
+    isNew: false,
+    discount: 15,
+    gender: "Kids",
+    colors: ["bg-red-500", "bg-black"],
+    colorNames: ["Red", "Black"],
+    sizes: [6, 7, 8]
+  },
+  {
+    id: 15,
+    name: "Junior Kicks",
+    price: 45.00,
+    category: "Sneakers",
+    rating: 4.8,
+    reviews: 211,
+    image: "/images/products/product1.png",
+    isNew: false,
+    discount: 0,
+    gender: "Kids",
+    colors: ["bg-white", "bg-black"],
+    colorNames: ["White", "Black"],
+    sizes: [6, 7]
+  },
+  {
+    id: 16,
+    name: "Lil Trainer X",
+    price: 75.00,
+    category: "Training",
+    rating: 4.9,
+    reviews: 156,
+    image: "/images/products/product2.png",
+    isNew: true,
+    discount: 25,
+    gender: "Kids",
+    colors: ["bg-green-500", "bg-white"],
+    colorNames: ["Green", "White"],
+    sizes: [7, 8]
   }
 ];
 
