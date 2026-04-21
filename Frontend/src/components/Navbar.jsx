@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, Heart, Menu, X, ChevronRight, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import AccountDropdown from './AccountDropdown';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -69,9 +71,19 @@ const Navbar = () => {
               className="w-10 focus:w-[180px] xl:focus:w-[220px] h-9 pl-10 pr-4 rounded-full bg-background-main/40 border border-transparent focus:border-border-accent focus:outline-none focus:ring-1 focus:ring-primary focus:bg-background-main/80 text-white text-sm transition-all duration-300 placeholder:text-transparent focus:placeholder:text-text-muted/70 cursor-pointer focus:cursor-text"
             />
           </div>
-          <Link to="/login" className="text-text-secondary hover:text-white transition-colors">
-            <User size={20} />
-          </Link>
+          <div className="relative">
+            <button
+              onClick={() => setIsAccountOpen(prev => !prev)}
+              className={`text-text-secondary hover:text-white transition-colors ${isAccountOpen ? 'text-white' : ''}`}
+              aria-label="Account"
+            >
+              <User size={20} />
+            </button>
+            <AccountDropdown
+              isOpen={isAccountOpen}
+              onClose={() => setIsAccountOpen(false)}
+            />
+          </div>
           <Link to="/wishlist" className="text-text-secondary hover:text-white transition-colors">
             <Heart size={20} />
           </Link>
