@@ -6,6 +6,7 @@ import FilterSidebar from '../components/FilterSidebar';
 import FilterDrawer from '../components/FilterDrawer';
 import SortDropdown from '../components/SortDropdown';
 import ActiveFilters from '../components/ActiveFilters';
+import CategoryBanner from '../components/CategoryBanner';
 import { products } from '../data/products';
 import { useFilters } from '../context/FilterContext';
 
@@ -89,15 +90,25 @@ const Women = () => {
 
   return (
     <div className="min-h-screen pb-24">
-      {/* Banner */}
-      <div className="bg-background-card border-b border-border-accent py-12 px-6">
-        <div className="container mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Women's Collection</h1>
-          <p className="text-text-muted max-w-2xl text-lg">
-            Empower your every step with our premium selection of women's athletic and casual footwear. Engineered for peak performance and uncompromising style.
-          </p>
-        </div>
-      </div>
+      <CategoryBanner
+        title="Women's Collection"
+        description="Empower your every step with our premium women's athletic and casual footwear."
+        offers={[
+          { ticker: '✨ Flat 40% Off Women Collection — Weekend Only!', accent: '' },
+          { ticker: '👠 Free Shipping on All Heels & Flats', accent: 'lime' },
+          { ticker: '🎁 New Arrival Drop — Shop the Latest', accent: 'lime' },
+        ]}
+        upcomingDeals={[
+          'Flat 40% Off All Collection',
+          'Free Shipping on Heels',
+          'Weekend Flash Sale',
+        ]}
+        newLaunches={[
+          'New Heels Collection',
+          'Summer Flats Drop',
+          'Athleisure Sneakers',
+        ]}
+      />
 
       {/* Main Content Area */}
       <div className="container mx-auto px-6 mt-8">

@@ -6,6 +6,7 @@ import FilterSidebar from '../components/FilterSidebar';
 import FilterDrawer from '../components/FilterDrawer';
 import SortDropdown from '../components/SortDropdown';
 import ActiveFilters from '../components/ActiveFilters';
+import CategoryBanner from '../components/CategoryBanner';
 import { products } from '../data/products';
 import { useFilters } from '../context/FilterContext';
 
@@ -89,15 +90,25 @@ const Men = () => {
 
   return (
     <div className="min-h-screen pb-24">
-      {/* Banner */}
-      <div className="bg-background-card border-b border-border-accent py-12 px-6">
-        <div className="container mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Men's Selection</h1>
-          <p className="text-text-muted max-w-2xl text-lg">
-            High-performance gear engineered for the modern athlete. From track to street, find your perfect pair.
-          </p>
-        </div>
-      </div>
+      <CategoryBanner
+        title="Men's Selection"
+        description="High-performance gear engineered for the modern athlete. From track to street, find your perfect pair."
+        offers={[
+          { ticker: '🔥 30% Off Running Shoes — Today Only!', accent: '' },
+          { ticker: '👟 Buy 1 Get 1 on All Sneakers', accent: 'lime' },
+          { ticker: '🚀 Free Shipping above ₹2000', accent: 'lime' },
+        ]}
+        upcomingDeals={[
+          'Weekend Sale — 30% Off',
+          'Buy 1 Get 1 on Sneakers',
+          'Free Shipping on ₹2000+',
+        ]}
+        newLaunches={[
+          'New Running Collection',
+          'Elite Sneaker Drop',
+          'Latest Sports Shoes',
+        ]}
+      />
 
       {/* Main Content Area */}
       <div className="container mx-auto px-6 mt-8">

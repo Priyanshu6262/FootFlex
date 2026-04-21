@@ -6,6 +6,7 @@ import FilterSidebar from '../components/FilterSidebar';
 import FilterDrawer from '../components/FilterDrawer';
 import SortDropdown from '../components/SortDropdown';
 import ActiveFilters from '../components/ActiveFilters';
+import CategoryBanner from '../components/CategoryBanner';
 import { products } from '../data/products';
 import { useFilters } from '../context/FilterContext';
 
@@ -36,7 +37,7 @@ const Kids = () => {
       if (activeFilters.categories.length > 0) {
         if (!activeFilters.categories.includes(product.category)) return false;
       }
-      
+
       // Check Sizes
       if (activeFilters.sizes.length > 0) {
         const hasSize = activeFilters.sizes.some(size => product.sizes?.includes(size));
@@ -88,30 +89,40 @@ const Kids = () => {
   }, [activeFilters, sortBy]);
 
   return (
-    <div className="min-h-screen pb-24">
-      {/* Banner */}
-      <div className="bg-background-card border-b border-border-accent py-12 px-6">
-        <div className="container mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Kids Playground</h1>
-          <p className="text-text-muted max-w-2xl text-lg">
-            Durability meets fun. Equip the next generation with FootFlex athletic gear designed for comfort, resilience, and boundless energy.
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen pb-15">
+      <CategoryBanner
+        title="Kids Playground"
+        description="Durability meets fun. Equip the next generation with footwear designed for comfort, resilience, and boundless energy."
+        offers={[
+          { ticker: '🎉 Kids Sale — Up to 50% Off All Styles!', accent: '' },
+          { ticker: '🎫 School Sports Collection — Special Offer', accent: 'lime' },
+          { ticker: '😊 Buy Any 2 & Get Free Socks Pack', accent: 'lime' },
+        ]}
+        upcomingDeals={[
+          'Kids Sale Up to 50% Off',
+          'School Sports Offer',
+          'Buy 2 Get Free Socks',
+        ]}
+        newLaunches={[
+          'School Sports Collection',
+          'Colourful Sneaker Drop',
+          'Dino Themed Kids Shoes',
+        ]}
+      />
 
       {/* Main Content Area */}
       <div className="container mx-auto px-6 mt-8">
         <div className="flex gap-8">
           {/* Desktop Sidebar */}
-          <FilterSidebar 
-            activeFilters={activeFilters} 
-            onFilterChange={handleFilterChange} 
+          <FilterSidebar
+            activeFilters={activeFilters}
+            onFilterChange={handleFilterChange}
           />
 
           {/* Mobile Drawer */}
-          <FilterDrawer 
-            isOpen={isMobileFilterOpen} 
-            onClose={() => setIsMobileFilterOpen(false)} 
+          <FilterDrawer
+            isOpen={isMobileFilterOpen}
+            onClose={() => setIsMobileFilterOpen(false)}
             activeFilters={activeFilters}
             onFilterChange={handleFilterChange}
           />
@@ -126,14 +137,14 @@ const Kids = () => {
 
               <div className="flex items-center gap-3">
                 {/* Mobile Filter Button */}
-                <button 
+                <button
                   onClick={() => setIsMobileFilterOpen(true)}
                   className="lg:hidden flex items-center justify-center gap-2 px-4 py-2 bg-background-card border border-border-accent rounded-xl text-white hover:border-primary/50 transition-colors"
                 >
                   <Filter size={18} />
                   <span className="text-sm font-medium">Filter</span>
                 </button>
-                
+
                 {/* Sort Component */}
                 <SortDropdown sortBy={sortBy} onSortChange={(value) => setSort('kids', value)} />
               </div>
@@ -144,7 +155,7 @@ const Kids = () => {
 
             {/* Grid Layout Container */}
             {filteredAndSortedProducts.length > 0 ? (
-              <motion.div 
+              <motion.div
                 layout
                 className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
               >
@@ -164,9 +175,9 @@ const Kids = () => {
                 </AnimatePresence>
               </motion.div>
             ) : (
-              <motion.div 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-border-accent rounded-3xl"
               >
                 <div className="w-16 h-16 rounded-full bg-background-card flex items-center justify-center mb-4">
@@ -174,7 +185,7 @@ const Kids = () => {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">No Results Found</h3>
                 <p className="text-text-muted max-w-sm mb-6">We couldn't find any shoes matching your specific filter combination.</p>
-                <button 
+                <button
                   onClick={() => handleFilterChange('clear', null)}
                   className="px-6 py-2 bg-primary text-white font-bold rounded-full hover:bg-primary-hover transition-colors"
                 >
