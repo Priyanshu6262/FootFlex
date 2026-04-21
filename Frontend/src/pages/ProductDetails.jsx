@@ -69,7 +69,7 @@ const ProductDetails = () => {
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 mb-20">
           
           {/* Left: Gallery */}
-          <div className="w-full lg:w-1/2 flex flex-col-reverse md:flex-row gap-4">
+          <div className="w-full lg:w-1/2 flex flex-col-reverse md:flex-row gap-4 h-full">
             
             {/* Thumbnails */}
             <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto no-scrollbar py-1">
@@ -85,34 +85,55 @@ const ProductDetails = () => {
               ))}
             </div>
 
-            {/* Main Image */}
-            <motion.div 
-              layoutId={`product-image-${product.id}`}
-              className="flex-1 bg-gradient-to-br from-[#18181b] to-background-card rounded-[2.5rem] border border-[#27272a] relative flex items-center justify-center p-8 md:max-h-[450px] aspect-square md:aspect-auto group overflow-hidden"
-            >
-               {/* 3D Glass overlay */}
-               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-               <motion.img 
-                 key={activeImage}
-                 initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
-                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                 transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-                 src={images[activeImage]} 
-                 alt={product.name}
-                 className="w-full h-full object-contain drop-shadow-2xl relative z-10 group-hover:scale-110 transition-transform duration-500 origin-center"
-               />
-               
-               {/* Badges */}
-               <div className="absolute top-6 left-6 z-20 flex flex-col gap-2">
-                 {product.isNew && <span className="bg-badge-new text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">NEW IN</span>}
-                 {product.discount > 0 && <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">{product.discount}% OFF</span>}
-               </div>
+            {/* Main Image & Extra Card Column */}
+            <div className="flex flex-col gap-4 flex-1">
+              {/* Main Image */}
+              <motion.div 
+                layoutId={`product-image-${product.id}`}
+                className="bg-gradient-to-br from-[#18181b] to-background-card rounded-[2.5rem] border border-[#27272a] relative flex items-center justify-center p-8 md:max-h-[450px] aspect-square md:aspect-auto group overflow-hidden"
+              >
+                 {/* 3D Glass overlay */}
+                 <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                 <motion.img 
+                   key={activeImage}
+                   initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+                   animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                   transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                   src={images[activeImage]} 
+                   alt={product.name}
+                   className="w-full h-full object-contain drop-shadow-2xl relative z-10 group-hover:scale-110 transition-transform duration-500 origin-center max-h-[350px]"
+                 />
+                 
+                 {/* Badges */}
+                 <div className="absolute top-6 left-6 z-20 flex flex-col gap-2">
+                   {product.isNew && <span className="bg-badge-new text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg">NEW IN</span>}
+                   {product.discount > 0 && <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">{product.discount}% OFF</span>}
+                 </div>
 
-               {/* Floating Wishlist */}
-               <button className="absolute top-6 right-6 z-20 w-12 h-12 rounded-full bg-background-main/80 backdrop-blur border border-border-accent flex items-center justify-center text-text-secondary hover:text-rose-500 hover:border-rose-500 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all group/btn">
-                  <Heart size={22} className="group-hover/btn:scale-110 transition-transform" />
-               </button>
-            </motion.div>
+                 {/* Floating Wishlist */}
+                 <button className="absolute top-6 right-6 z-20 w-12 h-12 rounded-full bg-background-main/80 backdrop-blur border border-border-accent flex items-center justify-center text-text-secondary hover:text-rose-500 hover:border-rose-500 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all group/btn">
+                    <Heart size={22} className="group-hover/btn:scale-110 transition-transform" />
+                 </button>
+              </motion.div>
+
+              {/* Extra Image Card (Fills space under the reduced main image) */}
+              <div className="hidden md:flex flex-1 min-h-[160px] bg-background-card rounded-[2.5rem] border border-border-accent relative overflow-hidden group">
+                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+                 <img 
+                   src="/images/hero-shoe.png" 
+                   alt="Lifestyle View" 
+                   className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-80 transition-all duration-700 blur-[2px] group-hover:blur-0" 
+                 />
+                 <div className="relative z-20 p-6 flex flex-col justify-end h-full">
+                    <div className="flex items-center gap-2 mb-1 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                      <span className="w-8 h-px bg-primary inline-block" />
+                      <span className="text-primary text-xs font-bold uppercase tracking-wider">Premium Tech</span>
+                    </div>
+                    <h3 className="text-white font-black uppercase tracking-widest text-xl drop-shadow-md">Engineered for Excellence</h3>
+                    <p className="text-[#d4d4d8] text-sm font-medium drop-shadow mt-1">Discover the materials behind {product.name}</p>
+                 </div>
+              </div>
+            </div>
           </div>
 
           {/* Right: Info */}
