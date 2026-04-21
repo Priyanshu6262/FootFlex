@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Men from './pages/Men';
+import Women from './pages/Women';
 import Footer from './components/Footer';
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
             <Route path="/" element={<Home />} />
             {/* Added placeholder routes to complete the structure later */}
             <Route path="/men" element={<Men />} />
-            <Route path="/women" element={<div className="h-screen flex items-center justify-center text-3xl">Women Collection Coming Soon</div>} />
+            <Route path="/women" element={<Women />} />
             <Route path="/kids" element={<div className="h-screen flex items-center justify-center text-3xl">Kids Collection Coming Soon</div>} />
             <Route path="/cart" element={<div className="h-screen flex items-center justify-center text-3xl">Cart Coming Soon</div>} />
             <Route path="/wishlist" element={<div className="h-screen flex items-center justify-center text-3xl">Wishlist Coming Soon</div>} />

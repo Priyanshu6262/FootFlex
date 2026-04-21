@@ -9,6 +9,7 @@ export const products = [
     image: "/images/products/product1.png",
     isNew: true,
     discount: 0,
+    gender: "Men",
     colors: ["bg-blue-500", "bg-black", "bg-white"],
     colorNames: ["Blue", "Black", "White"],
     sizes: [7, 8, 9, 10, 11]
@@ -23,6 +24,7 @@ export const products = [
     image: "/images/products/product2.png",
     isNew: false,
     discount: 15,
+    gender: "Women",
     colors: ["bg-rose-400", "bg-white", "bg-gray-200"],
     colorNames: ["Red", "White", "Grey"],
     sizes: [6, 7, 8]
@@ -37,6 +39,7 @@ export const products = [
     image: "/images/products/product3.png",
     isNew: true,
     discount: 0,
+    gender: "Men",
     colors: ["bg-black", "bg-yellow-500"],
     colorNames: ["Black"],
     sizes: [9, 10, 11]
@@ -51,6 +54,7 @@ export const products = [
     image: "/images/products/product4.png",
     isNew: false,
     discount: 25,
+    gender: "Women",
     colors: ["bg-green-700", "bg-orange-500", "bg-black"],
     colorNames: ["Green", "Black"],
     sizes: [8, 9, 10]
@@ -65,6 +69,7 @@ export const products = [
     image: "/images/products/product5.png",
     isNew: true,
     discount: 10,
+    gender: "Men",
     colors: ["bg-lime-500", "bg-orange-500", "bg-blue-400"],
     colorNames: ["Green", "Blue"],
     sizes: [6, 7]
@@ -79,6 +84,7 @@ export const products = [
     image: "/images/products/product1.png",
     isNew: false,
     discount: 20,
+    gender: "Women",
     colors: ["bg-white", "bg-black"],
     colorNames: ["White", "Black"],
     sizes: [8, 9, 10, 11]
@@ -93,6 +99,7 @@ export const products = [
     image: "/images/products/product2.png",
     isNew: true,
     discount: 0,
+    gender: "Men",
     colors: ["bg-black", "bg-gray-800"],
     colorNames: ["Black", "Grey"],
     sizes: [9, 10, 11]
@@ -107,6 +114,7 @@ export const products = [
     image: "/images/products/product3.png",
     isNew: false,
     discount: 30,
+    gender: "Women",
     colors: ["bg-gray-300", "bg-blue-300"],
     colorNames: ["Grey", "Blue"],
     sizes: [7, 8, 9]
@@ -121,6 +129,7 @@ export const products = [
     image: "/images/products/product4.png",
     isNew: true,
     discount: 0,
+    gender: "Men",
     colors: ["bg-red-600", "bg-black"],
     colorNames: ["Red", "Black"],
     sizes: [10, 11]
@@ -135,6 +144,7 @@ export const products = [
     image: "/images/products/product5.png",
     isNew: false,
     discount: 0,
+    gender: "Women",
     colors: ["bg-white", "bg-red-500"],
     colorNames: ["White", "Red"],
     sizes: [7, 8, 9, 10]
@@ -149,6 +159,7 @@ export const products = [
     image: "/images/products/product1.png",
     isNew: false,
     discount: 10,
+    gender: "Men",
     colors: ["bg-orange-400", "bg-white"],
     colorNames: ["White"],
     sizes: [8, 9, 10]
@@ -163,6 +174,7 @@ export const products = [
     image: "/images/products/product2.png",
     isNew: true,
     discount: 5,
+    gender: "Women",
     colors: ["bg-black"],
     colorNames: ["Black"],
     sizes: [9, 10]

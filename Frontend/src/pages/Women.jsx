@@ -7,7 +7,7 @@ import FilterDrawer from '../components/FilterDrawer';
 import SortDropdown from '../components/SortDropdown';
 import { products } from '../data/products';
 
-const Men = () => {
+const Women = () => {
   const [activeFilters, setActiveFilters] = useState({
     categories: [],
     sizes: [],
@@ -40,8 +40,8 @@ const Men = () => {
   const filteredAndSortedProducts = useMemo(() => {
     // 1. Array filtration
     let result = products.filter(product => {
-      // Must be Men's shoe
-      if (product.gender !== "Men") return false;
+      // Must be Women's shoe
+      if (product.gender !== "Women") return false;
 
       // Check Categories
       if (activeFilters.categories.length > 0) {
@@ -93,9 +93,9 @@ const Men = () => {
       {/* Banner */}
       <div className="bg-background-card border-b border-border-accent py-12 px-6">
         <div className="container mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Men's Collection</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Women's Collection</h1>
           <p className="text-text-muted max-w-2xl text-lg">
-            Elevate your game with our premium selection of men's athletic and casual footwear. Engineered for peak performance and uncompromising style.
+            Empower your every step with our premium selection of women's athletic and casual footwear. Engineered for peak performance and uncompromising style.
           </p>
         </div>
       </div>
@@ -186,4 +186,4 @@ const Men = () => {
   );
 };
 
-export default Men;
+export default Women;
