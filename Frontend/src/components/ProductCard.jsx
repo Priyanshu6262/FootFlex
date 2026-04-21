@@ -1,5 +1,6 @@
 import { Heart, Eye, Star } from 'lucide-react';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import AddToCartButton from './AddToCartButton';
 
 const ProductCard = ({ product }) => {
@@ -78,19 +79,19 @@ const ProductCard = ({ product }) => {
       </div>
 
       {/* Image Container */}
-      <div className="relative h-64 mb-6 rounded-2xl overflow-hidden bg-gradient-to-b from-background-main to-transparent flex items-center justify-center">
+      <Link to={`/product/${product.id}`} className="block relative h-64 mb-6 rounded-2xl overflow-hidden bg-gradient-to-b from-background-main to-transparent flex items-center justify-center">
         {/* Background glow for image */}
-        <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         
         <motion.img 
           src={product.image} 
           alt={product.name}
-          className="w-[85%] object-contain drop-shadow-2xl z-10"
+          className="w-[85%] object-contain drop-shadow-2xl z-10 block"
           style={{ transform: "translateZ(60px)" }}
           whileHover={{ scale: 1.1, rotate: -5 }}
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
         />
-      </div>
+      </Link>
 
       {/* Product Details */}
       <div className="px-2" style={{ transform: "translateZ(20px)" }}>
@@ -102,7 +103,9 @@ const ProductCard = ({ product }) => {
           </div>
         </div>
         
-        <h3 className="text-white font-bold text-lg mb-4 truncate">{product.name}</h3>
+        <Link to={`/product/${product.id}`}>
+          <h3 className="text-white font-bold text-lg mb-4 truncate hover:text-primary transition-colors">{product.name}</h3>
+        </Link>
         
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-col">

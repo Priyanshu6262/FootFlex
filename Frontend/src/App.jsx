@@ -14,10 +14,6 @@ function App() {
     <FilterProvider>
       <Router>
         <Routes>
-          {/* Standalone pages — no Navbar/Footer */}
-          {/* <Route path="/login" element={<Login />} /> */}
-
-
           {/* Main layout pages */}
           <Route path="/*" element={
             <div className="min-h-screen flex flex-col bg-background-main selection:bg-primary/30">
