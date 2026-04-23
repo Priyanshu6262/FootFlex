@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
@@ -7,7 +7,6 @@ import FilterDrawer from '../components/FilterDrawer';
 import SortDropdown from '../components/SortDropdown';
 import ActiveFilters from '../components/ActiveFilters';
 import CategoryBanner from '../components/CategoryBanner';
-import { products } from '../data/products';
 import { useFilters } from '../context/FilterContext';
 
 const Kids = () => {
@@ -16,6 +15,46 @@ const Kids = () => {
   const sortBy = activeFilters.sort;
 
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [backendProducts, setBackendProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/products');
+        if (!response.ok) throw new Error('Failed to fetch products');
+        const data = await response.json();
+        
+        const mappedProducts = data.map(p => ({
+          id: p._id,
+          name: p.name,
+          image: `http://localhost:5000${p.imageUrl}`,
+          price: p.price,
+          discount: p.discount,
+          category: p.gender,
+          gender: p.gender,
+          rating: 4.5,
+          reviews: Math.floor(Math.random() * 200) + 10,
+          isNew: (new Date() - new Date(p.createdAt)) < (7 * 24 * 60 * 60 * 1000),
+          details: p.details,
+          specifications: p.specifications,
+          colors: p.colors,
+          colorNames: p.colors,
+          sizes: p.sizes,
+          coupon: p.coupon
+        }));
+        
+        setBackendProducts(mappedProducts);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Filter Update Handler
   const handleFilterChange = (filterType, value) => {
@@ -29,7 +68,7 @@ const Kids = () => {
   // Memoized Filter & Sort Pipeline
   const filteredAndSortedProducts = useMemo(() => {
     // 1. Array filtration
-    let result = products.filter(product => {
+    let result = backendProducts.filter(product => {
       // Must be Kids' shoe
       if (product.gender !== "Kids") return false;
 
@@ -86,11 +125,21 @@ const Kids = () => {
     });
 
     return result;
-  }, [activeFilters, sortBy]);
+  }, [activeFilters, sortBy, backendProducts]);
 
   return (
-    <div className="min-h-screen pb-15">
-      <CategoryBanner
+    <div className="min-h-screen pb-15 bg-background-main">
+      {loading ? (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="min-h-screen flex items-center justify-center text-white">
+          <p className="text-xl text-red-400">Error: {error}</p>
+        </div>
+      ) : (
+        <>
+          <CategoryBanner
         title="Kids Playground"
         description="Durability meets fun. Equip the next generation with footwear designed for comfort, resilience, and boundless energy."
         offers={[
@@ -197,6 +246,8 @@ const Kids = () => {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };

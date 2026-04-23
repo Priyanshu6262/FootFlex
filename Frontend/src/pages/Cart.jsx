@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, ChevronRight, ShieldCheck, Tag, CreditCard, MapPin, Package, CheckCircle2, ChevronLeft } from 'lucide-react';
+import { Trash2, ChevronRight, ShieldCheck, Tag, CreditCard, MapPin, Package, CheckCircle2, ChevronLeft, Plus, Phone } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const steps = ['BAG', 'ADDRESS', 'PAYMENT'];
 
@@ -11,15 +12,34 @@ const Cart = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [orderPlaced, setOrderPlaced] = useState(false);
 
-  // Address state
-  const [address, setAddress] = useState({ name: '', phone: '', pincode: '', address: '', city: '', state: '' });
-
-  // Payment state
+  // Address selection state
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [showAllAddresses, setShowAllAddresses] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const { user } = useAuth();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [activeStep]);
+    if (user && activeStep === 1) {
+      fetchAddresses();
+    }
+  }, [activeStep, user]);
+
+  const fetchAddresses = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/address?userId=${user.uid}`);
+      const data = await response.json();
+      setAddresses(data);
+      // Auto-select default address if available
+      const defaultAddr = data.find(addr => addr.isDefault);
+      if (defaultAddr && !selectedAddress) {
+        setSelectedAddress(defaultAddr);
+      }
+    } catch (err) {
+      console.error("Failed to fetch addresses", err);
+    }
+  };
 
   const totalAmount = cartTotalMrp - discountTotal;
 
@@ -66,10 +86,10 @@ const Cart = () => {
         <div className="flex items-center justify-between relative">
           <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-[#27272a] -z-10 rounded-full overflow-hidden">
              <motion.div 
-               className="h-full bg-primary"
-               initial={{ width: '0%' }}
-               animate={{ width: `${(activeStep / (steps.length - 1)) * 100}%` }}
-               transition={{ duration: 0.5, ease: 'easeInOut' }}
+                className="h-full bg-primary"
+                initial={{ width: '0%' }}
+                animate={{ width: `${(activeStep / (steps.length - 1)) * 100}%` }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
              />
           </div>
           {steps.map((step, index) => (
@@ -150,33 +170,62 @@ const Cart = () => {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.4 }}
               >
-                <div className="bg-background-card border border-border-accent rounded-3xl p-6 sm:p-8">
-                  <div className="flex items-center gap-3 mb-6 pb-6 border-b border-border-accent">
-                    <MapPin className="text-primary" size={24} />
-                    <h2 className="text-xl font-bold text-white uppercase tracking-wider">Delivery Information</h2>
+                <div className="bg-background-card border border-border-accent rounded-[2.5rem] p-6 sm:p-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-border-accent">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                        <MapPin size={24} />
+                      </div>
+                      <h2 className="text-xl font-black text-white uppercase tracking-wider">Select Delivery Address</h2>
+                    </div>
+                    <Link to="/addresses" className="flex items-center gap-2 px-4 py-2 bg-[#18181b] border border-border-accent rounded-xl text-xs font-bold text-white hover:bg-[#27272a] transition-all uppercase tracking-widest">
+                       <Plus size={16} /> Manage Addresses
+                    </Link>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-[#a1a1aa] uppercase tracking-wider pl-1">Full Name</label>
-                      <input type="text" value={address.name} onChange={e => setAddress({...address, name: e.target.value})} className="w-full bg-[#18181b] border border-[#27272a] rounded-xl h-12 px-4 text-white focus:outline-none focus:border-primary transition-colors" placeholder="John Doe" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-[#a1a1aa] uppercase tracking-wider pl-1">Mobile Number</label>
-                      <input type="tel" value={address.phone} onChange={e => setAddress({...address, phone: e.target.value})} className="w-full bg-[#18181b] border border-[#27272a] rounded-xl h-12 px-4 text-white focus:outline-none focus:border-primary transition-colors" placeholder="+91 9876543210" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-[#a1a1aa] uppercase tracking-wider pl-1">Pincode</label>
-                      <input type="text" value={address.pincode} onChange={e => setAddress({...address, pincode: e.target.value})} className="w-full bg-[#18181b] border border-[#27272a] rounded-xl h-12 px-4 text-white focus:outline-none focus:border-primary transition-colors" placeholder="110001" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-[#a1a1aa] uppercase tracking-wider pl-1">City/District</label>
-                      <input type="text" value={address.city} onChange={e => setAddress({...address, city: e.target.value})} className="w-full bg-[#18181b] border border-[#27272a] rounded-xl h-12 px-4 text-white focus:outline-none focus:border-primary transition-colors" placeholder="New Delhi" />
-                    </div>
-                    <div className="sm:col-span-2 space-y-1.5">
-                      <label className="text-xs font-bold text-[#a1a1aa] uppercase tracking-wider pl-1">Delivery Address</label>
-                      <textarea value={address.address} onChange={e => setAddress({...address, address: e.target.value})} rows={3} className="w-full bg-[#18181b] border border-[#27272a] rounded-xl p-4 text-white focus:outline-none focus:border-primary transition-colors resize-none" placeholder="House/Flat No., Building Name, Street..."></textarea>
-                    </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    {addresses.slice(0, showAllAddresses ? addresses.length : 3).map((addr) => (
+                      <div 
+                        key={addr._id}
+                        onClick={() => setSelectedAddress(addr)}
+                        className={`cursor-pointer p-5 rounded-3xl border-2 transition-all relative group ${selectedAddress?._id === addr._id ? 'border-primary bg-primary/5' : 'border-border-accent bg-[#18181b] hover:border-[#3f3f46]'}`}
+                      >
+                         <div className="flex items-start gap-4">
+                            <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${selectedAddress?._id === addr._id ? 'border-primary' : 'border-[#52525b]'}`}>
+                               {selectedAddress?._id === addr._id && <div className="w-2.5 h-2.5 bg-primary rounded-full shadow-[0_0_8px_rgba(0,122,255,0.6)]" />}
+                            </div>
+                            <div className="flex-grow">
+                               <div className="flex items-center gap-3 mb-2">
+                                  <span className="text-white font-bold uppercase tracking-tight">{addr.name}</span>
+                                  <span className="bg-[#27272a] text-[10px] font-black px-2 py-0.5 rounded text-text-muted uppercase">{addr.type}</span>
+                                  {addr.isDefault && <span className="bg-primary/20 text-primary text-[10px] font-black px-2 py-0.5 rounded uppercase">Default</span>}
+                               </div>
+                               <p className="text-text-secondary text-sm leading-relaxed mb-1">{addr.street}</p>
+                               <p className="text-white text-xs font-semibold">{addr.city}, {addr.state} - {addr.pincode}</p>
+                               <p className="text-text-muted text-xs mt-3 flex items-center gap-1.5"><Phone size={12}/> {addr.phone}</p>
+                            </div>
+                         </div>
+                      </div>
+                    ))}
+
+                    {addresses.length > 3 && !showAllAddresses && (
+                      <button 
+                        onClick={() => setShowAllAddresses(true)}
+                        className="py-4 text-primary font-black text-xs uppercase tracking-[0.2em] border border-dashed border-border-accent rounded-2xl hover:bg-primary/5 transition-all"
+                      >
+                        Show {addresses.length - 3} More Addresses
+                      </button>
+                    )}
+
+                    {addresses.length === 0 && (
+                      <div className="text-center py-12 bg-[#18181b] rounded-3xl border border-dashed border-border-accent">
+                         <MapPin size={40} className="mx-auto text-text-muted mb-4 opacity-20" />
+                         <p className="text-text-muted font-medium mb-6">No saved addresses found.</p>
+                         <Link to="/addresses" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl text-sm transition-all hover:shadow-[0_0_20px_rgba(0,122,255,0.3)]">
+                           ADD NEW ADDRESS
+                         </Link>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -191,24 +240,26 @@ const Cart = () => {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.4 }}
               >
-                <div className="bg-background-card border border-border-accent rounded-3xl p-6 sm:p-8">
+                <div className="bg-background-card border border-border-accent rounded-[2.5rem] p-6 sm:p-8">
                   <div className="flex items-center gap-3 mb-6 pb-6 border-b border-border-accent">
-                    <CreditCard className="text-primary" size={24} />
-                    <h2 className="text-xl font-bold text-white uppercase tracking-wider">Payment Method</h2>
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                      <CreditCard size={24} />
+                    </div>
+                    <h2 className="text-xl font-black text-white uppercase tracking-wider">Payment Method</h2>
                   </div>
                   
                   <div className="space-y-3">
                     {/* Method 1 */}
                     <div 
                       onClick={() => setPaymentMethod('card')}
-                      className={`cursor-pointer p-5 rounded-2xl border-2 transition-all flex items-center justify-between ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-[#27272a] bg-[#18181b] hover:border-[#3f3f46]'}`}
+                      className={`cursor-pointer p-5 rounded-3xl border-2 transition-all flex items-center justify-between ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-[#27272a] bg-[#18181b] hover:border-[#3f3f46]'}`}
                     >
                       <div className="flex items-center gap-4">
                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'card' ? 'border-primary' : 'border-[#52525b]'}`}>
                            {paymentMethod === 'card' && <div className="w-3 h-3 bg-primary rounded-full" />}
                          </div>
                          <div>
-                            <p className="text-white font-bold">Credit / Debit Card</p>
+                            <p className="text-white font-black uppercase text-sm tracking-wide">Credit / Debit Card</p>
                             <p className="text-[#a1a1aa] text-xs">Visa, MasterCard, Amex, RuPay</p>
                          </div>
                       </div>
@@ -218,27 +269,27 @@ const Cart = () => {
                     {/* Method 2 */}
                     <div 
                       onClick={() => setPaymentMethod('upi')}
-                      className={`cursor-pointer p-5 rounded-2xl border-2 transition-all flex items-center justify-between ${paymentMethod === 'upi' ? 'border-primary bg-primary/5' : 'border-[#27272a] bg-[#18181b] hover:border-[#3f3f46]'}`}
+                      className={`cursor-pointer p-5 rounded-3xl border-2 transition-all flex items-center justify-between ${paymentMethod === 'upi' ? 'border-primary bg-primary/5' : 'border-[#27272a] bg-[#18181b] hover:border-[#3f3f46]'}`}
                     >
                       <div className="flex items-center gap-4">
                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'upi' ? 'border-primary' : 'border-[#52525b]'}`}>
                            {paymentMethod === 'upi' && <div className="w-3 h-3 bg-primary rounded-full" />}
                          </div>
-                         <p className="text-white font-bold">UPI PhonePe / GPay / Paytm</p>
+                         <p className="text-white font-black uppercase text-sm tracking-wide">UPI PhonePe / GPay / Paytm</p>
                       </div>
                     </div>
 
                     {/* Method 3 */}
                     <div 
                       onClick={() => setPaymentMethod('cod')}
-                      className={`cursor-pointer p-5 rounded-2xl border-2 transition-all flex items-center justify-between ${paymentMethod === 'cod' ? 'border-primary bg-primary/5' : 'border-[#27272a] bg-[#18181b] hover:border-[#3f3f46]'}`}
+                      className={`cursor-pointer p-5 rounded-3xl border-2 transition-all flex items-center justify-between ${paymentMethod === 'cod' ? 'border-primary bg-primary/5' : 'border-[#27272a] bg-[#18181b] hover:border-[#3f3f46]'}`}
                     >
                       <div className="flex items-center gap-4">
                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'cod' ? 'border-primary' : 'border-[#52525b]'}`}>
                            {paymentMethod === 'cod' && <div className="w-3 h-3 bg-primary rounded-full" />}
                          </div>
                          <div>
-                            <p className="text-white font-bold">Pay on Delivery</p>
+                            <p className="text-white font-black uppercase text-sm tracking-wide">Pay on Delivery</p>
                             <p className="text-[#a1a1aa] text-xs">Pay with cash or UPI directly at your door</p>
                          </div>
                       </div>
@@ -272,10 +323,25 @@ const Cart = () => {
 
         {/* Right Column: Price Summary */}
         <div className="w-full lg:w-[380px]">
-          <div className="bg-background-card border border-border-accent rounded-3xl p-6 lg:p-8 sticky top-32">
-             <h3 className="text-white font-bold uppercase tracking-wider mb-6 pb-4 border-b border-border-accent flex items-center gap-2">
-               <Tag size={18} className="text-primary"/> Price Details 
-               <span className="text-xs text-[#a1a1aa] bg-[#18181b] px-2 py-0.5 rounded-full ml-auto">({cartCount} Item{cartCount > 1 ? 's' : ''})</span>
+          <div className="bg-background-card border border-border-accent rounded-[2.5rem] p-6 lg:p-8 sticky top-32">
+             
+             {/* Selected Address Summary (Only in Steps > 1) */}
+             <AnimatePresence>
+                {activeStep === 2 && selectedAddress && (
+                   <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-5 bg-[#18181b] rounded-3xl border border-border-accent">
+                      <div className="flex items-center gap-2 mb-3">
+                         <MapPin size={16} className="text-primary" />
+                         <span className="text-[10px] font-black text-white uppercase tracking-widest">Delivering to:</span>
+                      </div>
+                      <p className="text-white font-bold text-sm mb-1">{selectedAddress.name}</p>
+                      <p className="text-text-muted text-xs leading-relaxed">{selectedAddress.street}, {selectedAddress.city} - {selectedAddress.pincode}</p>
+                   </motion.div>
+                )}
+             </AnimatePresence>
+
+             <h3 className="text-white font-black uppercase tracking-widest text-xs mb-6 pb-4 border-b border-border-accent flex items-center gap-2">
+               Price Details 
+               <span className="text-[10px] text-primary bg-primary/10 px-2.5 py-1 rounded-full ml-auto">{cartCount} {cartCount > 1 ? 'ITEMS' : 'ITEM'}</span>
              </h3>
              
              {/* Apply Coupon (Only in BAG step) */}
@@ -283,57 +349,87 @@ const Cart = () => {
                {activeStep === 0 && (
                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mb-6 overflow-hidden">
                    <div className="flex relative">
-                     <input type="text" placeholder="Coupon Code" className="w-full h-12 bg-[#18181b] border border-[#27272a] rounded-xl pl-4 pr-24 text-white uppercase focus:outline-none focus:border-primary transition-colors text-sm" />
-                     <button className="absolute right-1 top-1 bottom-1 px-4 bg-[#27272a] hover:bg-[#3f3f46] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors">Apply</button>
+                     <input type="text" placeholder="Coupon Code" className="w-full h-12 bg-[#18181b] border border-[#27272a] rounded-xl pl-4 pr-24 text-white uppercase focus:outline-none focus:border-primary transition-colors text-xs font-bold tracking-widest" />
+                     <button className="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest rounded-lg transition-all hover:bg-primary hover:text-white">Apply</button>
                    </div>
                  </motion.div>
                )}
              </AnimatePresence>
 
              <div className="space-y-4 mb-6">
-                <div className="flex justify-between items-center text-sm font-medium">
+                <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
                   <span className="text-[#a1a1aa]">Total MRP</span>
                   <span className="text-white">₹{cartTotalMrp.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between items-center text-sm font-medium">
-                  <span className="text-[#a1a1aa]">Discount on MRP</span>
+                <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
+                  <span className="text-[#a1a1aa]">Discount</span>
                   <span className="text-green-500">- ₹{discountTotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between items-center text-sm font-medium">
-                  <span className="text-[#a1a1aa]">Coupon Discount</span>
-                  <span className="text-primary cursor-pointer hover:underline">Apply Coupon</span>
-                </div>
-                <div className="flex justify-between items-center text-sm font-medium">
+                <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
                   <span className="text-[#a1a1aa]">Shipping Fee</span>
-                  <span className="text-green-500 uppercase font-bold text-xs tracking-wider">Free</span>
+                  <span className="text-green-500 font-black">Free</span>
                 </div>
              </div>
 
-             <div className="flex justify-between items-center text-lg font-black text-white pt-5 border-t border-border-accent mb-8">
-                <span>Total Amount</span>
+             <div className="flex justify-between items-center text-xl font-black text-white pt-5 border-t border-border-accent mb-8">
+                <span className="text-xs uppercase tracking-widest">Total</span>
                 <span>₹{totalAmount.toFixed(2)}</span>
              </div>
 
-             {/* Action Button */}
+             {/* Dynamic Error Message */}
+             {activeStep === 1 && !selectedAddress && addresses.length > 0 && (
+               <p className="text-rose-500 text-[10px] font-black uppercase text-center mb-4 tracking-widest animate-pulse">Please select a delivery address</p>
+             )}
+
              <button 
-               onClick={() => {
-                 if (activeStep < 2) setActiveStep(activeStep + 1);
-                 else setOrderPlaced(true);
+               disabled={activeStep === 1 && !selectedAddress}
+               onClick={async () => {
+                 if (activeStep < 2) {
+                   setActiveStep(activeStep + 1);
+                 } else {
+                   try {
+                     const orderData = {
+                       items: cart,
+                       customerName: selectedAddress.name || 'Guest'
+                     };
+                     const response = await fetch('http://localhost:5000/api/orders', {
+                       method: 'POST',
+                       headers: {
+                         'Content-Type': 'application/json'
+                       },
+                       body: JSON.stringify(orderData)
+                     });
+                     
+                     if (response.ok) {
+                       setOrderPlaced(true);
+                       clearCart();
+                     } else {
+                       alert('Failed to place order. Please try again.');
+                     }
+                   } catch (error) {
+                     console.error('Checkout error:', error);
+                     alert('An error occurred during checkout.');
+                   }
+                 }
                }}
-               className="w-full bg-primary text-white font-bold h-14 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+               className={`w-full font-black h-14 rounded-2xl flex items-center justify-center gap-3 transition-all uppercase tracking-[0.2em] text-xs ${
+                 (activeStep === 1 && !selectedAddress) 
+                 ? 'bg-[#27272a] text-[#52525b] cursor-not-allowed' 
+                 : 'bg-primary text-white shadow-[0_0_25px_rgba(0,122,255,0.2)] hover:shadow-[0_0_40px_rgba(0,122,255,0.4)] hover:bg-primary/90 active:scale-95'
+               }`}
              >
-               {activeStep === 0 && <>PLACE ORDER <ChevronRight size={20} /></>}
-               {activeStep === 1 && <>PROCEED TO PAYMENT <ChevronRight size={20} /></>}
-               {activeStep === 2 && <span className="flex items-center gap-2"><ShieldCheck size={20}/> PAY & COMPLETE ORDER</span>}
+               {activeStep === 0 && <>Checkout <ChevronRight size={18} /></>}
+               {activeStep === 1 && <>Continue <ChevronRight size={18} /></>}
+               {activeStep === 2 && <span className="flex items-center gap-2"><ShieldCheck size={20}/> Pay Now</span>}
              </button>
 
              {/* Back Button */}
              {activeStep > 0 && (
                <button 
                  onClick={() => setActiveStep(activeStep - 1)}
-                 className="w-full mt-4 text-sm font-bold text-[#a1a1aa] hover:text-white uppercase tracking-wider flex items-center justify-center gap-1 transition-colors"
+                 className="w-full mt-6 text-[10px] font-black text-text-muted hover:text-white uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-colors"
                >
-                 <ChevronLeft size={16} /> BACK TO {steps[activeStep - 1]}
+                 <ChevronLeft size={16} /> Back to {steps[activeStep - 1]}
                </button>
              )}
 

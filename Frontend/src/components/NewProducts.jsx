@@ -1,12 +1,51 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
-import { products } from '../data/products';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const NewProducts = () => {
-  // Only take new products for this section
-  const newProducts = products.filter(p => p.isNew).slice(0, 3);
+  const [newProducts, setNewProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/products');
+        if (!response.ok) throw new Error('Failed to fetch');
+        const data = await response.json();
+        
+        const mappedProducts = data.map(p => ({
+          id: p._id,
+          name: p.name,
+          image: `http://localhost:5000${p.imageUrl}`,
+          price: p.price,
+          discount: p.discount,
+          category: p.gender,
+          rating: 4.5,
+          reviews: Math.floor(Math.random() * 200) + 10,
+          isNew: (new Date() - new Date(p.createdAt)) < (7 * 24 * 60 * 60 * 1000),
+          details: p.details,
+          specifications: p.specifications,
+          colors: p.colors,
+          colorNames: p.colors,
+          sizes: p.sizes,
+          coupon: p.coupon
+        }));
+        
+        // Filter new products and take top 3
+        const justDropped = mappedProducts.filter(p => p.isNew).slice(0, 3);
+        // Fallback: If no 'new' products, just show the 3 most recently added
+        setNewProducts(justDropped.length > 0 ? justDropped : mappedProducts.slice(0, 3));
+      } catch (err) {
+        console.error("Failed to load new products", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <section className="py-24 bg-background-main relative overflow-hidden">
@@ -42,19 +81,23 @@ const NewProducts = () => {
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {newProducts.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.15 }}
-            >
-              <ProductCard product={product} />
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center"><div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div></div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {newProducts.map((product, index) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, delay: index * 0.15 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

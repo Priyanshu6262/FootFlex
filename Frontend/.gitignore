@@ -23,6 +23,28 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Firebase
+firebase-debug.log*
+firestore-debug.log*
+pubsub-debug.log*
+ui-debug.log*
+firebase-export*
+.firebase/
+
 # Graphify
 .graphify/
+
+# Misc
+.DS_Store
+.vscode/
+.idea/
+node_modules/
+dist/
+dist-ssr/
+*.local
 .agent/
