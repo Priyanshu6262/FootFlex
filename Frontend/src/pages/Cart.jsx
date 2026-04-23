@@ -387,24 +387,109 @@ const Cart = () => {
                  if (activeStep < 2) {
                    setActiveStep(activeStep + 1);
                  } else {
+                   // FINAL PAYMENT STEP
                    try {
-                     const orderData = {
-                       items: cart,
-                       customerName: selectedAddress.name || 'Guest'
-                     };
-                     const response = await fetch('http://localhost:5000/api/orders', {
-                       method: 'POST',
-                       headers: {
-                         'Content-Type': 'application/json'
-                       },
-                       body: JSON.stringify(orderData)
-                     });
-                     
-                     if (response.ok) {
-                       setOrderPlaced(true);
-                       clearCart();
+                     if (paymentMethod === 'cod') {
+                        // --- COD FLOW ---
+                        const orderData = {
+                          userId: user.uid,
+                          items: cart.map(item => ({
+                            productId: item.id,
+                            name: item.name,
+                            image: item.image,
+                            quantity: item.quantity,
+                            price: item.price * (1 - (item.discount || 0) / 100),
+                            size: item.size,
+                            color: item.color
+                          })),
+                          shippingAddress: selectedAddress,
+                          amount: totalAmount,
+                          paymentMethod: 'COD',
+                          paymentStatus: 'Pending'
+                        };
+
+                        const response = await fetch('http://localhost:5000/api/orders', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(orderData)
+                        });
+
+                        if (response.ok) {
+                          setOrderPlaced(true);
+                          clearCart();
+                        } else {
+                          alert('Failed to place order. Please try again.');
+                        }
                      } else {
-                       alert('Failed to place order. Please try again.');
+                        // --- ONLINE FLOW (RAZORPAY) ---
+                        // 1. Create order on backend
+                        const orderRes = await fetch('http://localhost:5000/api/payments/create-order', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ amount: totalAmount })
+                        });
+                        const razorpayOrder = await orderRes.json();
+
+                        // 2. Open Razorpay Modal
+                        const options = {
+                          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_placeholder', 
+                          amount: razorpayOrder.amount,
+                          currency: "INR",
+                          name: "FootFlex",
+                          description: "Order Payment",
+                          order_id: razorpayOrder.id,
+                          handler: async (response) => {
+                             // 3. Verify Payment
+                             const verifyRes = await fetch('http://localhost:5000/api/payments/verify-payment', {
+                               method: 'POST',
+                               headers: { 'Content-Type': 'application/json' },
+                               body: JSON.stringify(response)
+                             });
+
+                             if (verifyRes.ok) {
+                                // 4. Place Order on Backend
+                                const orderData = {
+                                  userId: user.uid,
+                                  items: cart.map(item => ({
+                                    productId: item.id,
+                                    name: item.name,
+                                    image: item.image,
+                                    quantity: item.quantity,
+                                    price: item.price * (1 - (item.discount || 0) / 100),
+                                    size: item.size,
+                                    color: item.color
+                                  })),
+                                  shippingAddress: selectedAddress,
+                                  amount: totalAmount,
+                                  paymentMethod: 'Online',
+                                  paymentStatus: 'Paid',
+                                  razorpayOrderId: response.razorpay_order_id,
+                                  razorpayPaymentId: response.razorpay_payment_id
+                                };
+
+                                const saveOrderRes = await fetch('http://localhost:5000/api/orders', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify(orderData)
+                                });
+
+                                if (saveOrderRes.ok) {
+                                  setOrderPlaced(true);
+                                  clearCart();
+                                }
+                             } else {
+                               alert("Payment verification failed. Please contact support.");
+                             }
+                          },
+                          prefill: {
+                            name: selectedAddress.name,
+                            contact: selectedAddress.phone,
+                          },
+                          theme: { color: "#007aff" }
+                        };
+
+                        const rzp = new window.Razorpay(options);
+                        rzp.open();
                      }
                    } catch (error) {
                      console.error('Checkout error:', error);

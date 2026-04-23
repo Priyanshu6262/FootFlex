@@ -2,24 +2,24 @@ const Order = require('../models/Order');
 
 exports.createOrder = async (req, res) => {
   try {
-    const { items, customerName } = req.body;
+    const { userId, items, shippingAddress, amount, paymentMethod, paymentStatus, razorpayOrderId, razorpayPaymentId } = req.body;
     
-    const orderPromises = items.map(item => {
-      const newOrder = new Order({
-        productName: item.name,
-        productImage: item.image,
-        quantity: item.quantity,
-        price: item.price * (1 - (item.discount || 0) / 100),
-        customerName: customerName || 'Guest'
-      });
-      return newOrder.save();
+    const newOrder = new Order({
+      userId,
+      items,
+      shippingAddress,
+      amount,
+      paymentMethod,
+      paymentStatus,
+      razorpayOrderId,
+      razorpayPaymentId
     });
 
-    const savedOrders = await Promise.all(orderPromises);
-    res.status(201).json({ message: 'Orders placed successfully', orders: savedOrders });
+    const savedOrder = await newOrder.save();
+    res.status(201).json({ message: 'Order placed successfully', order: savedOrder });
   } catch (error) {
-    console.error('Error placing orders:', error);
-    res.status(500).json({ error: 'Failed to place orders' });
+    console.error('Error placing order:', error);
+    res.status(500).json({ error: 'Failed to place order' });
   }
 };
 
