@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import imageCompression from 'browser-image-compression';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShoppingBag, 
@@ -287,11 +288,36 @@ const AddProductView = () => {
     }
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setFormData({ ...formData, image: file });
-      setPreviewImage(URL.createObjectURL(file));
+    if (!file) return;
+
+    // Check if format is supported
+    const supportedFormats = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!supportedFormats.includes(file.type)) {
+      alert('Only JPG, PNG, and WEBP formats are supported.');
+      return;
+    }
+
+    try {
+      const options = {
+        maxSizeMB: 0.15, // 150KB
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      const compressedFile = await imageCompression(file, options);
+      
+      if (compressedFile.size > 150 * 1024) {
+        alert('Image size must be under 150KB. Please try a smaller image.');
+        return;
+      }
+
+      setFormData({ ...formData, image: compressedFile });
+      setPreviewImage(URL.createObjectURL(compressedFile));
+    } catch (error) {
+      console.error('Compression error:', error);
+      alert('Failed to compress image. Please try again.');
     }
   };
 

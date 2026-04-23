@@ -2,7 +2,7 @@ const Product = require('../models/Product');
 
 exports.createProduct = async (req, res) => {
   try {
-    const { name, details, specifications, gender, price, discount, coupon, sizes, colors } = req.body;
+    const { name, details, specifications, gender, category, price, discount, coupon, sizes, colors } = req.body;
     const imageUrl = `/uploads/${req.file.filename}`;
 
     const newProduct = new Product({
@@ -10,6 +10,7 @@ exports.createProduct = async (req, res) => {
       details,
       specifications,
       gender,
+      category,
       price: Number(price),
       discount: Number(discount),
       coupon,
