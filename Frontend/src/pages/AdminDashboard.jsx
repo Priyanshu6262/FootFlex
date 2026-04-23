@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShoppingBag, 
@@ -17,7 +18,8 @@ import {
   CheckCircle2,
   Truck,
   PackageCheck,
-  Package
+  Package,
+  Sparkles
 } from 'lucide-react';
 
 // --- Sidebar Menu Items ---
@@ -214,6 +216,7 @@ const AddProductView = () => {
     details: '',
     specifications: '',
     gender: 'Men',
+    category: 'Running Shoes',
     price: '',
     discount: '',
     coupon: '',
@@ -223,7 +226,49 @@ const AddProductView = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
+
+  const categories = ['Running Shoes', 'Casual Shoes', 'Sports Shoes', 'Formal Shoes'];
+
+  const handleAIGenerate = async () => {
+    if (formData.colors.length === 0) {
+      alert('Please select at least one color for AI analysis.');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/ai/generate', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({
+          gender: formData.gender,
+          category: formData.category,
+          color: formData.colors.join(', ')
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setFormData(prev => ({
+          ...prev,
+          details: data.details,
+          specifications: data.specifications
+        }));
+      } else {
+        alert(data.error || 'AI generation failed');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to connect to AI service');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const sizes = ['6', '7', '8', '9', '10', '11', '12'];
   const colors = ['Black', 'White', 'Blue', 'Green', 'Gray', 'Red', 'Orange'];
@@ -308,16 +353,15 @@ const AddProductView = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-text-secondary mb-2">Price (INR)</label>
-              <input 
-                type="number" name="price" value={formData.price} onChange={handleInputChange} required
-                className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all"
-                placeholder="0.00"
-              />
-            </div>
-
             <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-text-secondary mb-2">Price (INR)</label>
+                <input 
+                  type="number" name="price" value={formData.price} onChange={handleInputChange} required
+                  className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all"
+                  placeholder="0.00"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-semibold text-text-secondary mb-2">Discount (%)</label>
                 <input 
@@ -326,6 +370,9 @@ const AddProductView = () => {
                   placeholder="0"
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-text-secondary mb-2">Gender</label>
                 <select 
@@ -338,6 +385,44 @@ const AddProductView = () => {
                   <option value="Unisex">Unisex</option>
                 </select>
               </div>
+              <div>
+                <label className="block text-sm font-semibold text-text-secondary mb-2">Category</label>
+                <select 
+                  name="category" value={formData.category} onChange={handleInputChange}
+                  className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all appearance-none"
+                >
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                  <Sparkles size={20} />
+                </div>
+                <div>
+                  <h4 className="text-white font-bold text-sm">AI Assistant</h4>
+                  <p className="text-[#71717a] text-[10px] font-medium">Generate details using Grok AI</p>
+                </div>
+              </div>
+              <button 
+                type="button"
+                onClick={handleAIGenerate}
+                disabled={isGenerating}
+                className="w-full py-2.5 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-black rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                {isGenerating ? (
+                   <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles size={14} />
+                    ANALYZE WITH AI
+                  </>
+                )}
+              </button>
             </div>
 
             <div>
@@ -448,8 +533,21 @@ const AddProductView = () => {
 // --- Main Dashboard Layout ---
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('all-orders');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      navigate('/admin/login');
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    navigate('/admin/login');
+  };
 
   return (
     <div className="min-h-screen bg-background-main flex relative">
@@ -501,7 +599,10 @@ const AdminDashboard = () => {
                     <div className="text-[10px] text-primary font-semibold uppercase tracking-wider">Super Admin</div>
                   </div>
                 </div>
-                <button className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold text-white transition-colors">
+                <button 
+                  onClick={handleLogout}
+                  className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold text-white transition-colors"
+                >
                   Sign Out
                 </button>
              </div>
