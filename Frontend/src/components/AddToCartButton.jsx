@@ -2,13 +2,23 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Check, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const AddToCartButton = ({ product, size, color }) => {
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [state, setState] = useState('idle'); // idle | adding | added
   const [particles, setParticles] = useState([]);
 
   const handleClick = () => {
+    if (!user) {
+      navigate('/login', { state: { from: location } });
+      return;
+    }
+
     if (state !== 'idle') return;
 
     // Spawn spark particles

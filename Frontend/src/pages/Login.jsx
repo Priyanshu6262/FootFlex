@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, useMotionValue, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { Shield, Zap, Star, ArrowRight, Loader2 } from 'lucide-react';
 
+import { useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
 /* ── Floating decoration orb ── */
 const Orb = ({ className, animate }) => (
   <motion.div
@@ -30,6 +33,9 @@ const FloatingBadge = ({ icon: Icon, text, delay, top, left, right }) => (
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { loginWithGoogle } = useAuth();
+  
   const [btnState, setBtnState] = useState('idle'); // idle | loading | success
   const cardRef = useRef(null);
 
@@ -47,15 +53,21 @@ const Login = () => {
   };
   const handleMouseLeave = () => { mouseX.set(0); mouseY.set(0); };
 
-  /* ── Simulated Google login ── */
-  const handleGoogleLogin = () => {
+  /* ── Firebase Google login ── */
+  const handleGoogleLogin = async () => {
     if (btnState !== 'idle') return;
     setBtnState('loading');
-    // TODO: Replace with real Firebase/OAuth Google sign-in
-    setTimeout(() => {
+    
+    try {
+      await loginWithGoogle();
       setBtnState('success');
-      setTimeout(() => navigate('/'), 900);
-    }, 1800);
+      const from = location.state?.from?.pathname || '/';
+      setTimeout(() => navigate(from, { replace: true }), 900);
+    } catch (error) {
+      console.error(error);
+      setBtnState('idle');
+      alert("Login failed. Please try again.");
+    }
   };
 
   return (

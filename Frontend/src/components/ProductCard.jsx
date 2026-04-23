@@ -1,12 +1,27 @@
 import { Heart, Eye, Star } from 'lucide-react';
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import AddToCartButton from './AddToCartButton';
+import { useAuth } from '../context/AuthContext';
 
 const ProductCard = ({ product }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   // 3D Tilt Effect variables
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+
+  const handleWishlistClick = (e) => {
+    e.preventDefault();
+    if (!user) {
+      navigate('/login', { state: { from: location } });
+    } else {
+      // Wishlist logic placeholder
+      console.log('Added to wishlist');
+    }
+  };
 
   function handleMouseMove({ currentTarget, clientX, clientY }) {
     let { left, top, width, height } = currentTarget.getBoundingClientRect();
@@ -70,7 +85,10 @@ const ProductCard = ({ product }) => {
 
       {/* Action Buttons (floating) */}
       <div className="absolute top-6 right-6 z-10 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0" style={{ transform: "translateZ(40px)" }}>
-        <button className="w-10 h-10 rounded-full bg-background-main/80 backdrop-blur border border-border-accent flex items-center justify-center text-text-secondary hover:text-white hover:border-primary hover:bg-primary/20 transition-all">
+        <button 
+          onClick={handleWishlistClick}
+          className="w-10 h-10 rounded-full bg-background-main/80 backdrop-blur border border-border-accent flex items-center justify-center text-text-secondary hover:text-white hover:border-primary hover:bg-primary/20 transition-all"
+        >
           <Heart size={18} />
         </button>
         <button className="w-10 h-10 rounded-full bg-background-main/80 backdrop-blur border border-border-accent flex items-center justify-center text-text-secondary hover:text-white hover:border-primary hover:bg-primary/20 transition-all">

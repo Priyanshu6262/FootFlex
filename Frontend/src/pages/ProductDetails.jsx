@@ -1,32 +1,92 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Star, Heart, ShieldCheck, Truck, RefreshCcw, Tag, 
   MapPin, CheckCircle2, ChevronRight, MessageSquare
 } from 'lucide-react';
 import AddToCartButton from '../components/AddToCartButton';
-import { products } from '../data/products';
 import ProductCard from '../components/ProductCard';
+import { useAuth } from '../context/AuthContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(null);
   const [pincode, setPincode] = useState('');
   const [pinStatus, setPinStatus] = useState(null); // null | 'checking' | 'success'
+  const [similarProducts, setSimilarProducts] = useState([]);
 
   useEffect(() => {
     // Scroll to top on load
     window.scrollTo(0, 0);
-    const found = products.find(p => p.id === parseInt(id)) || products[0];
-    setProduct(found);
-    if(found) {
-        setSelectedSize(found.sizes[0]);
-        setSelectedColor(found.colors[0]);
-    }
+    
+    const fetchProductData = async () => {
+      try {
+        // Fetch current product
+        const response = await fetch(`http://localhost:5000/api/products/${id}`);
+        if (!response.ok) throw new Error('Product not found');
+        const p = await response.json();
+        
+        const mappedProduct = {
+          id: p._id,
+          name: p.name,
+          image: `http://localhost:5000${p.imageUrl}`,
+          price: p.price,
+          discount: p.discount,
+          category: p.gender,
+          gender: p.gender,
+          rating: 4.8,
+          reviews: 124,
+          isNew: (new Date() - new Date(p.createdAt)) < (7 * 24 * 60 * 60 * 1000),
+          details: p.details,
+          specifications: p.specifications,
+          colors: p.colors,
+          colorNames: p.colors,
+          sizes: p.sizes,
+          coupon: p.coupon
+        };
+        
+        setProduct(mappedProduct);
+        if (mappedProduct.sizes.length > 0) setSelectedSize(mappedProduct.sizes[0]);
+        if (mappedProduct.colors.length > 0) setSelectedColor(mappedProduct.colors[0]);
+
+        // Fetch similar products
+        const allRes = await fetch('http://localhost:5000/api/products');
+        if (allRes.ok) {
+           const allProducts = await allRes.json();
+           const mappedSimilar = allProducts.map(sp => ({
+              id: sp._id,
+              name: sp.name,
+              image: `http://localhost:5000${sp.imageUrl}`,
+              price: sp.price,
+              discount: sp.discount,
+              category: sp.gender,
+              gender: sp.gender,
+              rating: 4.5,
+              reviews: 100,
+              isNew: (new Date() - new Date(sp.createdAt)) < (7 * 24 * 60 * 60 * 1000),
+              details: sp.details,
+              specifications: sp.specifications,
+              colors: sp.colors,
+              colorNames: sp.colors,
+              sizes: sp.sizes,
+              coupon: sp.coupon
+           }));
+           setSimilarProducts(mappedSimilar.filter(sp => sp.gender === mappedProduct.gender && sp.id !== mappedProduct.id));
+        }
+
+      } catch (err) {
+        console.error("Failed to load product", err);
+      }
+    };
+
+    fetchProductData();
   }, [id]);
 
   if (!product) return <div className="min-h-screen pt-32 text-center text-white">Loading...</div>;
@@ -43,6 +103,14 @@ const ProductDetails = () => {
     if(pincode.length < 5) return;
     setPinStatus('checking');
     setTimeout(() => setPinStatus('success'), 1200);
+  };
+
+  const handleWishlistClick = () => {
+    if (!user) {
+      navigate('/login', { state: { from: location } });
+    } else {
+      console.log('Added to wishlist');
+    }
   };
 
   const discountedPrice = product.price * (1 - product.discount / 100);
@@ -111,7 +179,7 @@ const ProductDetails = () => {
                  </div>
 
                  {/* Floating Wishlist */}
-                 <button className="absolute top-6 right-6 z-20 w-12 h-12 rounded-full bg-background-main/80 backdrop-blur border border-border-accent flex items-center justify-center text-text-secondary hover:text-rose-500 hover:border-rose-500 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all group/btn">
+                 <button onClick={handleWishlistClick} className="absolute top-6 right-6 z-20 w-12 h-12 rounded-full bg-background-main/80 backdrop-blur border border-border-accent flex items-center justify-center text-text-secondary hover:text-rose-500 hover:border-rose-500 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all group/btn">
                     <Heart size={22} className="group-hover/btn:scale-110 transition-transform" />
                  </button>
               </motion.div>
@@ -404,7 +472,7 @@ const ProductDetails = () => {
            </div>
            
            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-             {products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4).map(p => (
+             {similarProducts.slice(0, 4).map(p => (
                <ProductCard key={p.id} product={p} />
              ))}
            </div>

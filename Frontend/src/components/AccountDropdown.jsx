@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Package, Heart, Gift, Phone, CreditCard,
-  Tag, Wallet, MapPin, LogIn, UserPlus, ChevronRight
+  Tag, Wallet, MapPin, LogIn, UserPlus, ChevronRight, LogOut
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const menuSection1 = [
   { icon: Package,    label: 'Orders',          path: '/orders' },
@@ -17,11 +18,21 @@ const menuSection2 = [
   { icon: CreditCard, label: 'Credit',           path: '/credit' },
   { icon: Tag,        label: 'Coupons',          path: '/coupons' },
   { icon: Wallet,     label: 'Saved Cards',      path: '/saved-cards' },
-  { icon: MapPin,     label: 'Saved Addresses',  path: '/saved-addresses' },
+  { icon: MapPin,     label: 'Saved Addresses',  path: '/addresses' },
 ];
 
 const AccountDropdown = ({ isOpen, onClose }) => {
   const panelRef = useRef(null);
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      onClose();
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
 
   // Close on outside click
   useEffect(() => {
@@ -50,23 +61,50 @@ const AccountDropdown = ({ isOpen, onClose }) => {
         >
           {/* ── Welcome Header ── */}
           <div className="px-5 py-5 border-b border-[#27272a]">
-            <p className="text-white font-bold text-base tracking-wide">Welcome</p>
-            <p className="text-[#71717a] text-xs mt-0.5 leading-relaxed">
-              To access account and manage orders
-            </p>
+            {user ? (
+              <div className="flex items-center gap-4 mb-2">
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary shadow-[0_0_15px_rgba(0,122,255,0.3)]">
+                  <img src={user.photoURL || 'https://via.placeholder.com/150'} alt={user.displayName} className="w-full h-full object-cover" />
+                </div>
+                <div>
+                  <p className="text-white font-bold text-base tracking-wide truncate max-w-[160px]">{user.displayName}</p>
+                  <p className="text-[#71717a] text-xs truncate max-w-[160px]">{user.email}</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-white font-bold text-base tracking-wide">Welcome</p>
+                <p className="text-[#71717a] text-xs mt-0.5 leading-relaxed">
+                  To access account and manage orders
+                </p>
+              </>
+            )}
 
-            {/* Login / Signup Button */}
-            <Link
-              to="/login"
-              onClick={onClose}
-              className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl
-                         border border-primary text-primary font-bold text-sm tracking-wider
-                         hover:bg-primary hover:text-white transition-all duration-300
-                         shadow-[0_0_12px_rgba(0,122,255,0.15)] hover:shadow-[0_0_20px_rgba(0,122,255,0.35)]"
-            >
-              <LogIn size={16} />
-              LOGIN / SIGNUP
-            </Link>
+            {/* Login / Signup or Logout Button */}
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl
+                           border border-rose-500 text-rose-500 font-bold text-sm tracking-wider
+                           hover:bg-rose-500 hover:text-white transition-all duration-300
+                           shadow-[0_0_12px_rgba(244,63,94,0.15)] hover:shadow-[0_0_20px_rgba(244,63,94,0.35)]"
+              >
+                <LogOut size={16} />
+                LOGOUT
+              </button>
+            ) : (
+              <Link
+                to="/login"
+                onClick={onClose}
+                className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl
+                           border border-primary text-primary font-bold text-sm tracking-wider
+                           hover:bg-primary hover:text-white transition-all duration-300
+                           shadow-[0_0_12px_rgba(0,122,255,0.15)] hover:shadow-[0_0_20px_rgba(0,122,255,0.35)]"
+              >
+                <LogIn size={16} />
+                LOGIN / SIGNUP
+              </Link>
+            )}
           </div>
 
           {/* ── Section 1 ── */}

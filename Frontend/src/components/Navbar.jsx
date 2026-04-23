@@ -4,6 +4,7 @@ import { Search, ShoppingBag, Heart, Menu, X, ChevronRight, User } from 'lucide-
 import { motion, AnimatePresence } from 'framer-motion';
 import AccountDropdown from './AccountDropdown';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -11,6 +12,7 @@ const Navbar = () => {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const location = useLocation();
   const { cartCount } = useCart();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,10 +78,19 @@ const Navbar = () => {
           <div className="relative">
             <button
               onClick={() => setIsAccountOpen(prev => !prev)}
-              className={`text-text-secondary hover:text-white transition-colors ${isAccountOpen ? 'text-white' : ''}`}
+              className={`flex items-center gap-2 transition-all ${isAccountOpen ? 'text-white' : 'text-text-secondary hover:text-white'}`}
               aria-label="Account"
             >
-              <User size={20} />
+              {user ? (
+                <div className="flex items-center gap-2">
+                   <div className="w-8 h-8 rounded-full overflow-hidden border border-border-accent shadow-[0_0_10px_rgba(0,122,255,0.2)]">
+                      <img src={user.photoURL || 'https://via.placeholder.com/150'} alt="User" className="w-full h-full object-cover" />
+                   </div>
+                   <span className="text-xs font-bold uppercase tracking-widest hidden xl:inline-block">{user.displayName.split(' ')[0]}</span>
+                </div>
+              ) : (
+                <User size={20} />
+              )}
             </button>
             <AccountDropdown
               isOpen={isAccountOpen}
@@ -120,7 +131,21 @@ const Navbar = () => {
             className="fixed inset-0 z-[60] bg-background-main/95 backdrop-blur-xl md:hidden flex flex-col"
           >
             <div className="flex items-center justify-between p-6 border-b border-border-accent">
-              <span className="text-white font-bold text-xl">Menu</span>
+              <div className="flex items-center gap-3">
+                 {user ? (
+                   <>
+                     <div className="w-10 h-10 rounded-full overflow-hidden border border-primary">
+                        <img src={user.photoURL || 'https://via.placeholder.com/150'} alt="User" className="w-full h-full object-cover" />
+                     </div>
+                     <div>
+                        <p className="text-white font-bold text-sm">{user.displayName}</p>
+                        <p className="text-text-muted text-[10px] uppercase tracking-tighter">Premium Member</p>
+                     </div>
+                   </>
+                 ) : (
+                   <span className="text-white font-bold text-xl">Menu</span>
+                 )}
+              </div>
               <button onClick={() => setIsMobileMenuOpen(false)} className="text-text-secondary hover:text-white">
                 <X size={24} />
               </button>
@@ -149,10 +174,20 @@ const Navbar = () => {
             </div>
             
             <div className="p-6 border-t border-border-accent flex justify-around">
-               <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2 text-text-secondary hover:text-primary transition-colors">
-                 <User size={24} />
-                 <span className="text-xs">Login</span>
-               </Link>
+               {user ? (
+                 <button 
+                   onClick={() => { logout(); setIsMobileMenuOpen(false); }} 
+                   className="flex flex-col items-center gap-2 text-rose-500 hover:text-rose-400 transition-colors"
+                 >
+                   <User size={24} />
+                   <span className="text-xs">Logout</span>
+                 </button>
+               ) : (
+                 <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2 text-text-secondary hover:text-primary transition-colors">
+                   <User size={24} />
+                   <span className="text-xs">Login</span>
+                 </Link>
+               )}
                <Link to="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2 text-text-secondary hover:text-primary transition-colors">
                  <Heart size={24} />
                  <span className="text-xs">Wishlist</span>
