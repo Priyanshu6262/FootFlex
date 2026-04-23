@@ -10,6 +10,7 @@ import ProductDetails from './pages/ProductDetails';
 import Products from './pages/Products';
 import Cart from './pages/Cart';
 import Addresses from './pages/Addresses';
+import AdminLogin from './pages/AdminLogin';
 import Footer from './components/Footer';
 import { FilterProvider } from './context/FilterContext';
 import { CartProvider } from './context/CartContext';
@@ -37,7 +38,9 @@ function App() {
                       <Route path="/products" element={<Products />} />
                       <Route path="/wishlist" element={<div className="h-screen flex items-center justify-center text-3xl">Wishlist Coming Soon</div>} />
                       <Route path="/login" element={<Login />} />
+                      <Route path="/admin/login" element={<AdminLogin />} />
                       <Route path="/admin" element={<AdminDashboard />} />
+                      <Route path="/admin-dashboard" element={<AdminDashboard />} />
                       <Route path="/product/:id" element={<ProductDetails />} />
                     </Routes>
                   </main>
