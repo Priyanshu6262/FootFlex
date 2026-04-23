@@ -10,7 +10,7 @@ exports.generateProductContent = async (req, res) => {
     }
 
     if (!process.env.XAI_API_KEY) {
-      return res.status(500).json({ error: 'xAI API Key is not configured' });
+      return res.status(500).json({ error: 'Groq API Key is not configured' });
     }
 
     const prompt = `Generate a professional product description and specifications for a footwear product with the following details:
@@ -22,13 +22,12 @@ exports.generateProductContent = async (req, res) => {
     "details" should be a compelling 2-3 sentence marketing description.
     "specifications" should be a list of 4-5 technical bullet points (sole material, breathability, usage, etc.).`;
 
-    const response = await axios.post('https://api.x.ai/v1/chat/completions', {
-      model: "grok-beta",
+    const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
+      model: "llama3-8b-8192",
       messages: [
-        { role: "system", content: "You are a helpful assistant that generates high-end e-commerce content for a premium shoe brand called FootFlex." },
+        { role: "system", content: "You are a helpful assistant that generates high-end e-commerce content for a premium shoe brand called FootFlex. Always return strictly valid JSON." },
         { role: "user", content: prompt }
-      ],
-      response_format: { type: "json_object" }
+      ]
     }, {
       headers: {
         'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
@@ -36,10 +35,25 @@ exports.generateProductContent = async (req, res) => {
       }
     });
 
-    const aiContent = JSON.parse(response.data.choices[0].message.content);
+    const content = response.data.choices[0].message.content;
+    let aiContent;
+    
+    try {
+      // Find JSON block if AI wrapped it in markdown
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      aiContent = JSON.parse(jsonMatch ? jsonMatch[0] : content);
+    } catch (e) {
+      console.error('JSON Parsing Error:', content);
+      throw new Error('AI returned invalid format');
+    }
+
     res.status(200).json(aiContent);
   } catch (error) {
-    console.error('Error generating AI content:', error.response?.data || error.message);
-    res.status(500).json({ error: 'Failed to generate content with AI' });
+    const errorData = error.response?.data || error.message;
+    console.error('Error generating AI content:', errorData);
+    res.status(500).json({ 
+      error: 'Failed to generate content with Groq',
+      details: typeof errorData === 'object' ? JSON.stringify(errorData) : errorData 
+    });
   }
 };

@@ -261,7 +261,7 @@ const AddProductView = () => {
           specifications: data.specifications
         }));
       } else {
-        alert(data.error || 'AI generation failed');
+        alert(`${data.error}: ${data.details || 'Check backend console'}`);
       }
     } catch (error) {
       console.error(error);
