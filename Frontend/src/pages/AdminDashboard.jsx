@@ -140,33 +140,43 @@ const AllOrdersView = () => {
               transition={{ delay: idx * 0.05 }}
               className="bg-background-card border border-border-accent rounded-3xl p-6 min-w-[320px] max-w-[320px] snap-center flex flex-col justify-between shadow-xl"
             >
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <span className="text-primary text-xs font-bold bg-primary/10 px-2 py-1 rounded-lg">#{order._id.slice(-6).toUpperCase()}</span>
-                  <StatusBadge status={order.status} />
-                </div>
-                
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden bg-background-main border border-border-accent shrink-0">
-                    <img src={order.productImage} alt={order.productName} className="w-full h-full object-cover" />
-                  </div>
+              {(() => {
+                const item = order.items && order.items.length > 0 ? order.items[0] : {};
+                const customerName = order.shippingAddress?.name || 'Unknown';
+                return (
                   <div>
-                    <h3 className="text-white font-bold text-lg leading-tight mb-1">{order.productName}</h3>
-                    <p className="text-text-muted text-sm">Qty: {order.quantity}</p>
-                  </div>
-                </div>
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="text-primary text-xs font-bold bg-primary/10 px-2 py-1 rounded-lg">#{order._id.slice(-6).toUpperCase()}</span>
+                      <StatusBadge status={order.status} />
+                    </div>
+                    
+                    <div className="flex items-center gap-4 mb-5">
+                      <div className="w-20 h-20 rounded-2xl overflow-hidden bg-background-main border border-border-accent shrink-0 flex items-center justify-center">
+                        {item.image ? (
+                          <img src={item.image} alt={item.name || 'Product'} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-xs text-text-muted">No Image</span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-bold text-lg leading-tight mb-1 truncate">{item.name || 'Unknown Product'}</h3>
+                        <p className="text-text-muted text-sm">Qty: {item.quantity || 0}{order.items && order.items.length > 1 ? ` (+${order.items.length - 1})` : ''}</p>
+                      </div>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-5">
-                  <div className="bg-background-main p-3 rounded-2xl border border-border-accent">
-                     <p className="text-[#a1a1aa] text-[10px] uppercase font-bold tracking-wider mb-1">Customer</p>
-                     <p className="text-white text-sm font-semibold truncate">{order.customerName}</p>
+                    <div className="grid grid-cols-2 gap-4 mb-5">
+                      <div className="bg-background-main p-3 rounded-2xl border border-border-accent min-w-0">
+                         <p className="text-[#a1a1aa] text-[10px] uppercase font-bold tracking-wider mb-1">Customer</p>
+                         <p className="text-white text-sm font-semibold truncate">{customerName}</p>
+                      </div>
+                      <div className="bg-background-main p-3 rounded-2xl border border-border-accent min-w-0">
+                         <p className="text-[#a1a1aa] text-[10px] uppercase font-bold tracking-wider mb-1">Date</p>
+                         <p className="text-white text-sm font-semibold truncate">{new Date(order.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-background-main p-3 rounded-2xl border border-border-accent">
-                     <p className="text-[#a1a1aa] text-[10px] uppercase font-bold tracking-wider mb-1">Date</p>
-                     <p className="text-white text-sm font-semibold truncate">{new Date(order.createdAt).toLocaleDateString()}</p>
-                  </div>
-                </div>
-              </div>
+                );
+              })()}
 
               <div className="space-y-4">
                 <div className="flex flex-col gap-1.5">
