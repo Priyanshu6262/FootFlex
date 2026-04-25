@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import imageCompression from 'browser-image-compression';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ShoppingBag, 
-  Plus, 
-  Tag, 
-  Clock, 
-  Settings2, 
-  Box, 
+import {
+  ShoppingBag,
+  Plus,
+  Tag,
+  Clock,
+  Settings2,
+  Box,
   ChevronRight,
   Search,
   Filter,
@@ -20,7 +20,8 @@ import {
   Truck,
   PackageCheck,
   Package,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 
 // --- Sidebar Menu Items ---
@@ -75,13 +76,13 @@ const AllOrdersView = () => {
       const res = await fetch(`http://localhost:5000/api/orders?limit=${limit}&skip=${currentSkip}`);
       if (!res.ok) throw new Error('Failed to fetch orders');
       const data = await res.json();
-      
+
       if (isInitial) {
         setOrders(data.orders);
       } else {
         setOrders(prev => [...prev, ...data.orders]);
       }
-      
+
       if (data.orders.length < limit) {
         setHasMore(false);
       }
@@ -104,10 +105,10 @@ const AllOrdersView = () => {
         body: JSON.stringify({ status: newStatus })
       });
       if (!res.ok) throw new Error('Failed to update status');
-      
+
       const updatedOrder = await res.json();
-      
-      setOrders(orders.map(order => 
+
+      setOrders(orders.map(order =>
         order._id === orderId ? { ...order, status: updatedOrder.status } : order
       ));
     } catch (error) {
@@ -127,13 +128,14 @@ const AllOrdersView = () => {
 
       <div className="relative">
         <div className="flex overflow-x-auto gap-6 pb-8 snap-x scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <style dangerouslySetInnerHTML={{__html: `
+          <style dangerouslySetInnerHTML={{
+            __html: `
             .scrollbar-hide::-webkit-scrollbar {
                 display: none;
             }
           `}} />
           {orders.map((order, idx) => (
-            <motion.div 
+            <motion.div
               key={order._id}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -149,7 +151,7 @@ const AllOrdersView = () => {
                       <span className="text-primary text-xs font-bold bg-primary/10 px-2 py-1 rounded-lg">#{order._id.slice(-6).toUpperCase()}</span>
                       <StatusBadge status={order.status} />
                     </div>
-                    
+
                     <div className="flex items-center gap-4 mb-5">
                       <div className="w-20 h-20 rounded-2xl overflow-hidden bg-background-main border border-border-accent shrink-0 flex items-center justify-center">
                         {item.image ? (
@@ -166,12 +168,12 @@ const AllOrdersView = () => {
 
                     <div className="grid grid-cols-2 gap-4 mb-5">
                       <div className="bg-background-main p-3 rounded-2xl border border-border-accent min-w-0">
-                         <p className="text-[#a1a1aa] text-[10px] uppercase font-bold tracking-wider mb-1">Customer</p>
-                         <p className="text-white text-sm font-semibold truncate">{customerName}</p>
+                        <p className="text-[#a1a1aa] text-[10px] uppercase font-bold tracking-wider mb-1">Customer</p>
+                        <p className="text-white text-sm font-semibold truncate">{customerName}</p>
                       </div>
                       <div className="bg-background-main p-3 rounded-2xl border border-border-accent min-w-0">
-                         <p className="text-[#a1a1aa] text-[10px] uppercase font-bold tracking-wider mb-1">Date</p>
-                         <p className="text-white text-sm font-semibold truncate">{new Date(order.createdAt).toLocaleDateString()}</p>
+                        <p className="text-[#a1a1aa] text-[10px] uppercase font-bold tracking-wider mb-1">Date</p>
+                        <p className="text-white text-sm font-semibold truncate">{new Date(order.createdAt).toLocaleDateString()}</p>
                       </div>
                     </div>
                   </div>
@@ -181,7 +183,7 @@ const AllOrdersView = () => {
               <div className="space-y-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[#a1a1aa] text-xs font-semibold pl-1">Change Status</label>
-                  <select 
+                  <select
                     value={order.status}
                     onChange={(e) => handleStatusChange(order._id, e.target.value)}
                     className="bg-[#18181b] border border-[#27272a] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-primary transition-colors appearance-none cursor-pointer"
@@ -200,7 +202,7 @@ const AllOrdersView = () => {
               </div>
             </motion.div>
           ))}
-          
+
           {orders.length === 0 && (
             <div className="w-full text-center py-20 text-text-muted">No orders found.</div>
           )}
@@ -209,7 +211,7 @@ const AllOrdersView = () => {
 
       {hasMore && orders.length > 0 && (
         <div className="flex justify-center mt-4">
-          <button 
+          <button
             onClick={handleShowMore}
             className="px-8 py-3 bg-background-card border border-border-accent hover:border-primary text-white font-bold rounded-xl transition-all"
           >
@@ -224,78 +226,42 @@ const AllOrdersView = () => {
 const AddProductView = () => {
   const [formData, setFormData] = useState({
     name: '',
-    details: '',
-    specifications: '',
     gender: 'Men',
     category: 'Running Shoes',
     price: '',
     discount: '',
     coupon: '',
     image: null,
-    sizes: [],
-    colors: []
+    inventory: []
   });
 
+  const [currentVariant, setCurrentVariant] = useState({ size: '6', color: 'Black', quantity: 1 });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isRemovingBg, setIsRemovingBg] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
   const categories = ['Running Shoes', 'Casual Shoes', 'Sports Shoes', 'Formal Shoes'];
-
-  const handleAIGenerate = async () => {
-    if (formData.colors.length === 0) {
-      alert('Please select at least one color for AI analysis.');
-      return;
-    }
-
-    setIsGenerating(true);
-    try {
-      const response = await fetch('http://localhost:5000/api/ai/generate', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        },
-        body: JSON.stringify({
-          gender: formData.gender,
-          category: formData.category,
-          color: formData.colors.join(', ')
-        })
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setFormData(prev => ({
-          ...prev,
-          details: data.details,
-          specifications: data.specifications
-        }));
-      } else {
-        alert(`${data.error}: ${data.details || 'Check backend console'}`);
-      }
-    } catch (error) {
-      console.error(error);
-      alert('Failed to connect to AI service');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const sizes = ['6', '7', '8', '9', '10', '11', '12'];
   const colors = ['Black', 'White', 'Blue', 'Green', 'Gray', 'Red', 'Orange'];
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handleAddVariant = () => {
+    if (currentVariant.quantity < 1) {
+      alert('Quantity must be at least 1');
+      return;
+    }
+    const exists = formData.inventory.findIndex(v => v.size === currentVariant.size && v.color === currentVariant.color);
+    if (exists >= 0) {
+      const updated = [...formData.inventory];
+      updated[exists].quantity += Number(currentVariant.quantity);
+      setFormData({ ...formData, inventory: updated });
+    } else {
+      setFormData({ ...formData, inventory: [...formData.inventory, { ...currentVariant, quantity: Number(currentVariant.quantity) }] });
+    }
   };
 
-  const handleCheckboxChange = (type, value) => {
-    const current = [...formData[type]];
-    if (current.includes(value)) {
-      setFormData({ ...formData, [type]: current.filter(item => item !== value) });
-    } else {
-      setFormData({ ...formData, [type]: [...current, value] });
-    }
+  const handleRemoveVariant = (index) => {
+    const updated = formData.inventory.filter((_, i) => i !== index);
+    setFormData({ ...formData, inventory: updated });
   };
 
   const handleImageChange = async (e) => {
@@ -309,6 +275,7 @@ const AddProductView = () => {
       return;
     }
 
+    let compressedFile;
     try {
       const options = {
         maxSizeMB: 0.15, // 150KB
@@ -316,28 +283,82 @@ const AddProductView = () => {
         useWebWorker: true,
       };
 
-      const compressedFile = await imageCompression(file, options);
-      
+      compressedFile = await imageCompression(file, options);
+
       if (compressedFile.size > 150 * 1024) {
         alert('Image size must be under 150KB. Please try a smaller image.');
         return;
       }
 
-      setFormData({ ...formData, image: compressedFile });
+      setFormData(prev => ({ ...prev, image: compressedFile }));
       setPreviewImage(URL.createObjectURL(compressedFile));
     } catch (error) {
       console.error('Compression error:', error);
       alert('Failed to compress image. Please try again.');
+      return;
     }
+
+    // Attempt background removal
+    setIsRemovingBg(true);
+    try {
+      const bgData = new FormData();
+      bgData.append('image', compressedFile);
+
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        alert('Session expired. Please log in again.');
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      const bgResponse = await fetch('http://localhost:5000/api/ai/remove-bg', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: bgData
+      });
+
+      if (bgResponse.status === 401) {
+        localStorage.removeItem('adminToken');
+        alert('Your session has expired. Please log in again.');
+        window.location.href = '/admin/login';
+        return;
+      }
+
+      if (!bgResponse.ok) {
+        const errText = await bgResponse.text();
+        console.warn('Background removal failed:', errText, '— using original image.');
+        // Gracefully keep the original compressed image
+      } else {
+        const blob = await bgResponse.blob();
+        const cleanedFile = new File([blob], 'cleaned_image.png', { type: 'image/png' });
+        setFormData(prev => ({ ...prev, image: cleanedFile }));
+        setPreviewImage(URL.createObjectURL(cleanedFile));
+      }
+    } catch (error) {
+      console.error('Background removal error:', error);
+    } finally {
+      setIsRemovingBg(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.inventory.length === 0) {
+      alert('Please add at least one size/color variant with quantity.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     const data = new FormData();
     Object.keys(formData).forEach(key => {
-      if (key === 'sizes' || key === 'colors') {
+      if (key === 'inventory') {
         data.append(key, JSON.stringify(formData[key]));
       } else {
         data.append(key, formData[key]);
@@ -353,9 +374,9 @@ const AddProductView = () => {
       if (response.ok) {
         alert('Product added successfully!');
         setFormData({
-          name: '', details: '', specifications: '', gender: 'Men',
+          name: '', gender: 'Men', category: 'Running Shoes',
           price: '', discount: '', coupon: '', image: null,
-          sizes: [], colors: []
+          inventory: []
         });
         setPreviewImage(null);
       } else {
@@ -382,7 +403,7 @@ const AddProductView = () => {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-text-secondary mb-2">Product Name</label>
-              <input 
+              <input
                 type="text" name="name" value={formData.name} onChange={handleInputChange} required
                 className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all"
                 placeholder="e.g. Nike Air Max Apex"
@@ -392,7 +413,7 @@ const AddProductView = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-text-secondary mb-2">Price (INR)</label>
-                <input 
+                <input
                   type="number" name="price" value={formData.price} onChange={handleInputChange} required
                   className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all"
                   placeholder="0.00"
@@ -400,7 +421,7 @@ const AddProductView = () => {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-text-secondary mb-2">Discount (%)</label>
-                <input 
+                <input
                   type="number" name="discount" value={formData.discount} onChange={handleInputChange}
                   className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all"
                   placeholder="0"
@@ -411,7 +432,7 @@ const AddProductView = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-text-secondary mb-2">Gender</label>
-                <select 
+                <select
                   name="gender" value={formData.gender} onChange={handleInputChange}
                   className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all appearance-none"
                 >
@@ -423,7 +444,7 @@ const AddProductView = () => {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-text-secondary mb-2">Category</label>
-                <select 
+                <select
                   name="category" value={formData.category} onChange={handleInputChange}
                   className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all appearance-none"
                 >
@@ -434,36 +455,10 @@ const AddProductView = () => {
               </div>
             </div>
 
-            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
-                  <Sparkles size={20} />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold text-sm">AI Assistant</h4>
-                  <p className="text-[#71717a] text-[10px] font-medium">Generate details using Grok AI</p>
-                </div>
-              </div>
-              <button 
-                type="button"
-                onClick={handleAIGenerate}
-                disabled={isGenerating}
-                className="w-full py-2.5 bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-black rounded-xl transition-all flex items-center justify-center gap-2"
-              >
-                {isGenerating ? (
-                   <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <Sparkles size={14} />
-                    ANALYZE WITH AI
-                  </>
-                )}
-              </button>
-            </div>
 
             <div>
               <label className="block text-sm font-semibold text-text-secondary mb-2">Coupon/Offer</label>
-              <input 
+              <input
                 type="text" name="coupon" value={formData.coupon} onChange={handleInputChange}
                 className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all"
                 placeholder="e.g. SUMMER25"
@@ -475,13 +470,21 @@ const AddProductView = () => {
           <div className="space-y-6">
             <label className="block text-sm font-semibold text-text-secondary mb-2">Product Image</label>
             <div className="relative group h-[300px]">
-              <input 
+              <input
                 type="file" accept="image/*" onChange={handleImageChange} required={!previewImage}
                 className="absolute inset-0 opacity-0 cursor-pointer z-10"
               />
-              <div className={`w-full h-full border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center transition-all ${previewImage ? 'border-primary/50' : 'border-border-accent group-hover:border-primary'}`}>
+              <div className={`w-full h-full border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center transition-all ${previewImage ? 'border-primary/50' : 'border-border-accent group-hover:border-primary'} relative overflow-hidden`}>
                 {previewImage ? (
-                  <img src={previewImage} alt="Preview" className="w-full h-full object-contain p-4 rounded-[2rem]" />
+                  <>
+                    <img src={previewImage} alt="Preview" className={`w-full h-full object-contain p-4 rounded-[2rem] transition-opacity ${isRemovingBg ? 'opacity-50' : 'opacity-100'}`} />
+                    {isRemovingBg && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-background-main/50 backdrop-blur-sm z-20">
+                        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-2" />
+                        <span className="text-xs font-bold text-white uppercase tracking-wider">Removing Background...</span>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <>
                     <Plus size={40} className="text-text-muted mb-2 group-hover:text-primary transition-colors" />
@@ -493,62 +496,78 @@ const AddProductView = () => {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-text-secondary mb-2">Product Details</label>
-          <textarea 
-            name="details" value={formData.details} onChange={handleInputChange} required
-            className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all h-32"
-            placeholder="Describe the product features, comfort, and style..."
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-text-secondary mb-2">Specifications</label>
-          <textarea 
-            name="specifications" value={formData.specifications} onChange={handleInputChange} required
-            className="w-full bg-background-main border border-border-accent rounded-2xl py-3 px-4 text-white focus:border-primary outline-none transition-all h-32"
-            placeholder="List technical specs (e.g. Sole material, Weight, Tech used...)"
-          />
-        </div>
-
-        {/* Checkbox Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-          <div>
-            <label className="block text-sm font-semibold text-text-secondary mb-4">Available Sizes</label>
-            <div className="flex flex-wrap gap-3">
-              {sizes.map(size => (
-                <button
-                  key={size} type="button"
-                  onClick={() => handleCheckboxChange('sizes', size)}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
-                    formData.sizes.includes(size) ? 'bg-primary border-primary text-white' : 'bg-transparent border-border-accent text-text-secondary hover:border-white'
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
+        {/* Inventory Variants Section */}
+        <div className="bg-background-card/80 border border-border-accent rounded-3xl p-6 md:p-8 space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <Package size={24} className="text-primary" />
+              Inventory Variants
+            </h3>
+            <div className="bg-primary/20 text-primary px-4 py-1.5 rounded-full font-black text-sm flex items-center gap-2">
+              Total Quantity: {formData.inventory.reduce((sum, item) => sum + item.quantity, 0)}
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-text-secondary mb-4">Available Colors</label>
-            <div className="flex flex-wrap gap-3">
-              {colors.map(color => (
-                <button
-                  key={color} type="button"
-                  onClick={() => handleCheckboxChange('colors', color)}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
-                    formData.colors.includes(color) ? 'bg-primary border-primary text-white' : 'bg-transparent border-border-accent text-text-secondary hover:border-white'
-                  }`}
-                >
-                  {color}
-                </button>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-background-main p-4 rounded-2xl border border-border-accent">
+            <div>
+              <label className="block text-sm font-semibold text-text-secondary mb-2">Size</label>
+              <select
+                value={currentVariant.size} onChange={(e) => setCurrentVariant({ ...currentVariant, size: e.target.value })}
+                className="w-full bg-background-card border border-border-accent rounded-xl py-2.5 px-4 text-white focus:border-primary outline-none appearance-none"
+              >
+                {sizes.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-text-secondary mb-2">Color</label>
+              <select
+                value={currentVariant.color} onChange={(e) => setCurrentVariant({ ...currentVariant, color: e.target.value })}
+                className="w-full bg-background-card border border-border-accent rounded-xl py-2.5 px-4 text-white focus:border-primary outline-none appearance-none"
+              >
+                {colors.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-text-secondary mb-2">Quantity</label>
+              <input
+                type="number" min="1" value={currentVariant.quantity} onChange={(e) => setCurrentVariant({ ...currentVariant, quantity: parseInt(e.target.value) || 1 })}
+                className="w-full bg-background-card border border-border-accent rounded-xl py-2.5 px-4 text-white focus:border-primary outline-none"
+              />
+            </div>
+            <button
+              type="button" onClick={handleAddVariant}
+              className="w-full py-2.5 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+            >
+              <Plus size={18} /> Add
+            </button>
+          </div>
+
+          {/* Added Variants List */}
+          {formData.inventory.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {formData.inventory.map((variant, index) => (
+                <div key={index} className="flex items-center justify-between bg-background-main border border-border-accent p-3 rounded-xl">
+                  <div>
+                    <div className="text-white font-bold text-sm">Size: {variant.size} • {variant.color}</div>
+                    <div className="text-text-muted text-xs">{variant.quantity} in stock</div>
+                  </div>
+                  <button
+                    type="button" onClick={() => handleRemoveVariant(index)}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
               ))}
             </div>
-          </div>
+          ) : (
+            <div className="text-center py-6 text-text-muted text-sm border border-dashed border-border-accent rounded-xl">
+              No variants added yet. Select size, color, and quantity above.
+            </div>
+          )}
         </div>
 
-        <button 
+        <button
           type="submit" disabled={isSubmitting}
           className="w-full py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
         >
@@ -591,7 +610,7 @@ const AdminDashboard = () => {
       <div className="absolute left-0 top-0 w-64 h-full bg-gradient-to-r from-primary/5 to-transparent pointer-events-none -z-10" />
 
       {/* --- Sidebar (Left Section) --- */}
-      <aside 
+      <aside
         className={`fixed md:sticky top-20 left-0 h-[calc(100vh-80px)] w-72 bg-background-card/30 backdrop-blur-3xl border-r border-border-accent z-40 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
       >
         <div className="p-6 h-full flex flex-col">
@@ -605,16 +624,15 @@ const AdminDashboard = () => {
                     setActiveSection(item.id);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all relative group ${
-                    activeSection === item.id 
-                    ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                    : 'text-text-secondary hover:bg-white/5 hover:text-white'
-                  }`}
+                  className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all relative group ${activeSection === item.id
+                      ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                      : 'text-text-secondary hover:bg-white/5 hover:text-white'
+                    }`}
                 >
                   <item.icon size={20} className={activeSection === item.id ? 'text-white' : 'group-hover:scale-110 transition-transform'} />
                   <span className="font-semibold text-sm">{item.label}</span>
                   {activeSection === item.id && (
-                    <motion.div 
+                    <motion.div
                       layoutId="sidebar-active"
                       className="absolute right-3 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white]"
                     />
@@ -625,23 +643,23 @@ const AdminDashboard = () => {
           </div>
 
           <div className="mt-auto">
-             <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">
-                    A
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-white leading-tight">Admin User</div>
-                    <div className="text-[10px] text-primary font-semibold uppercase tracking-wider">Super Admin</div>
-                  </div>
+            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+                  A
                 </div>
-                <button 
-                  onClick={handleLogout}
-                  className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold text-white transition-colors"
-                >
-                  Sign Out
-                </button>
-             </div>
+                <div>
+                  <div className="text-sm font-bold text-white leading-tight">Admin User</div>
+                  <div className="text-[10px] text-primary font-semibold uppercase tracking-wider">Super Admin</div>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold text-white transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </aside>
@@ -658,11 +676,11 @@ const AdminDashboard = () => {
           >
             {activeSection === 'all-orders' && <AllOrdersView />}
             {activeSection === 'add-product' && <AddProductView />}
-            
+
             {!['all-orders', 'add-product'].includes(activeSection) && (
               <div className="h-[60vh] flex flex-col items-center justify-center text-center space-y-6">
                 <div className="w-24 h-24 rounded-full bg-background-card border border-border-accent flex items-center justify-center text-primary animate-pulse">
-                   {sidebarItems.find(i => i.id === activeSection)?.icon({ size: 40 })}
+                  {sidebarItems.find(i => i.id === activeSection)?.icon({ size: 40 })}
                 </div>
                 <div>
                   <h2 className="text-3xl font-bold text-white mb-2">
@@ -672,7 +690,7 @@ const AdminDashboard = () => {
                     The {sidebarItems.find(i => i.id === activeSection)?.label} module is currently under development. Please check back later.
                   </p>
                 </div>
-                <button 
+                <button
                   onClick={() => setActiveSection('all-orders')}
                   className="px-6 py-2.5 bg-background-card border border-border-accent rounded-xl text-white font-semibold hover:border-primary transition-all flex items-center gap-2 group"
                 >

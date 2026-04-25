@@ -30,7 +30,7 @@ const AddToCartButton = ({ product, size, color }) => {
 
     setState('adding');
     setTimeout(() => {
-      addToCart(product, size || product.sizes[0], color || product.colors[0]);
+      addToCart(product, size || (product.sizes && product.sizes[0]), color || (product.colors && product.colors[0]));
       setState('added');
       setTimeout(() => {
         setState('idle');

@@ -57,3 +57,38 @@ exports.generateProductContent = async (req, res) => {
     });
   }
 };
+
+exports.removeBackground = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    if (!process.env.REMOVE_BG_API_KEY) {
+      return res.status(500).json({ error: 'REMOVE_BG_API_KEY is not configured in .env' });
+    }
+
+    const FormData = require('form-data');
+    const formData = new FormData();
+    formData.append('size', 'auto');
+    formData.append('image_file', req.file.buffer, {
+      filename: req.file.originalname,
+      contentType: req.file.mimetype,
+    });
+
+    const response = await axios.post('https://api.remove.bg/v1.0/removebg', formData, {
+      headers: {
+        ...formData.getHeaders(),
+        'X-Api-Key': process.env.REMOVE_BG_API_KEY,
+      },
+      responseType: 'arraybuffer', // Important to receive binary data
+    });
+
+    res.set('Content-Type', 'image/png');
+    res.send(response.data);
+  } catch (error) {
+    const errorData = error.response?.data ? error.response.data.toString() : error.message;
+    console.error('Error removing background:', errorData);
+    res.status(500).json({ error: 'Failed to remove background' });
+  }
+};

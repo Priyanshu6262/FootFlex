@@ -27,9 +27,9 @@ const NewProducts = () => {
           isNew: (new Date() - new Date(p.createdAt)) < (7 * 24 * 60 * 60 * 1000),
           details: p.details,
           specifications: p.specifications,
-          colors: p.colors,
-          colorNames: p.colors,
-          sizes: p.sizes,
+          colors: p.inventory ? [...new Set(p.inventory.map(item => item.color))] : [],
+          colorNames: p.inventory ? [...new Set(p.inventory.map(item => item.color))] : [],
+          sizes: p.inventory ? [...new Set(p.inventory.map(item => item.size))] : [],
           coupon: p.coupon
         }));
         

@@ -44,17 +44,17 @@ const ProductDetails = () => {
           rating: 4.8,
           reviews: 124,
           isNew: (new Date() - new Date(p.createdAt)) < (7 * 24 * 60 * 60 * 1000),
-          details: p.details,
-          specifications: p.specifications,
-          colors: p.colors,
-          colorNames: p.colors,
-          sizes: p.sizes,
+          details: p.details || 'No details available.',
+          specifications: p.specifications || {},
+          colors: p.inventory ? [...new Set(p.inventory.map(item => item.color))] : [],
+          colorNames: p.inventory ? [...new Set(p.inventory.map(item => item.color))] : [],
+          sizes: p.inventory ? [...new Set(p.inventory.map(item => item.size))] : [],
           coupon: p.coupon
         };
         
         setProduct(mappedProduct);
-        if (mappedProduct.sizes.length > 0) setSelectedSize(mappedProduct.sizes[0]);
-        if (mappedProduct.colors.length > 0) setSelectedColor(mappedProduct.colors[0]);
+        if (mappedProduct.sizes && mappedProduct.sizes.length > 0) setSelectedSize(mappedProduct.sizes[0]);
+        if (mappedProduct.colors && mappedProduct.colors.length > 0) setSelectedColor(mappedProduct.colors[0]);
 
         // Fetch similar products
         const allRes = await fetch('http://localhost:5000/api/products');
@@ -73,9 +73,9 @@ const ProductDetails = () => {
               isNew: (new Date() - new Date(sp.createdAt)) < (7 * 24 * 60 * 60 * 1000),
               details: sp.details,
               specifications: sp.specifications,
-              colors: sp.colors,
-              colorNames: sp.colors,
-              sizes: sp.sizes,
+              colors: sp.inventory ? [...new Set(sp.inventory.map(item => item.color))] : [],
+              colorNames: sp.inventory ? [...new Set(sp.inventory.map(item => item.color))] : [],
+              sizes: sp.inventory ? [...new Set(sp.inventory.map(item => item.size))] : [],
               coupon: sp.coupon
            }));
            setSimilarProducts(mappedSimilar.filter(sp => sp.gender === mappedProduct.gender && sp.id !== mappedProduct.id));

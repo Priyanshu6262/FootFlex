@@ -2,28 +2,40 @@ const Product = require('../models/Product');
 
 exports.createProduct = async (req, res) => {
   try {
-    const { name, details, specifications, gender, category, price, discount, coupon, sizes, colors } = req.body;
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const { name, gender, category, price, discount, coupon, inventory } = req.body;
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.imageUrl;
+
+    let parsedInventory = [];
+    if (typeof inventory === 'string') {
+      parsedInventory = JSON.parse(inventory);
+    } else if (Array.isArray(inventory)) {
+      parsedInventory = inventory;
+    }
+
+    const totalQuantity = parsedInventory.reduce((sum, item) => sum + Number(item.quantity), 0);
 
     const newProduct = new Product({
       name,
-      details,
-      specifications,
       gender,
       category,
       price: Number(price),
       discount: Number(discount),
       coupon,
       imageUrl,
-      sizes: JSON.parse(sizes),
-      colors: JSON.parse(colors)
+      inventory: parsedInventory,
+      totalQuantity
     });
 
     await newProduct.save();
     res.status(201).json({ message: 'Product saved successfully', product: newProduct });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to save product' });
+    console.error('Failed to create product:', error);
+    res.status(500).json({ 
+      error: 'Failed to save product', 
+      message: error.message,
+      stack: error.stack,
+      validationErrors: error.errors 
+    });
   }
 };
 
