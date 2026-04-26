@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
+const { protect } = require('../middleware/authMiddleware');
 
 router.post('/login', adminController.login);
-router.post('/forgot-password', adminController.forgotPassword);
-router.patch('/reset-password/:token', adminController.resetPassword);
+router.get('/stats', protect, adminController.getDashboardStats);
 
 module.exports = router;

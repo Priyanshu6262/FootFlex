@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, ChevronRight, ShieldCheck, Tag, CreditCard, MapPin, Package, CheckCircle2, ChevronLeft, Plus, Phone } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -17,14 +17,19 @@ const Cart = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAllAddresses, setShowAllAddresses] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('card');
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (!authLoading && !user) {
+      navigate('/login');
+      return;
+    }
     if (user && activeStep === 1) {
       fetchAddresses();
     }
-  }, [activeStep, user]);
+  }, [activeStep, user, authLoading, navigate]);
 
   const fetchAddresses = async () => {
     try {
@@ -418,7 +423,8 @@ const Cart = () => {
                           setOrderPlaced(true);
                           clearCart();
                         } else {
-                          alert('Failed to place order. Please try again.');
+                          const errorData = await response.json();
+                          alert(errorData.error || 'Failed to place order. Please try again.');
                         }
                      } else {
                         // --- ONLINE FLOW (RAZORPAY) ---
@@ -476,6 +482,9 @@ const Cart = () => {
                                 if (saveOrderRes.ok) {
                                   setOrderPlaced(true);
                                   clearCart();
+                                } else {
+                                  const errorData = await saveOrderRes.json();
+                                  alert(errorData.error || "Failed to save order.");
                                 }
                              } else {
                                alert("Payment verification failed. Please contact support.");
