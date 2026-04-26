@@ -3,11 +3,18 @@ import { motion, useMotionTemplate, useMotionValue } from 'framer-motion';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import AddToCartButton from './AddToCartButton';
 import { useAuth } from '../context/AuthContext';
+import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 
 const ProductCard = ({ product }) => {
   const { user } = useAuth();
+  const { addToWishlist, removeFromWishlist, isWishlisted } = useWishlist();
+  const { removeProductFromCart } = useCart();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const wishlisted = isWishlisted(product.id);
   
   // 3D Tilt Effect variables
   const mouseX = useMotionValue(0);
@@ -17,9 +24,16 @@ const ProductCard = ({ product }) => {
     e.preventDefault();
     if (!user) {
       navigate('/login', { state: { from: location } });
+      return;
+    }
+    if (wishlisted) {
+      removeFromWishlist(product.id);
+      showToast('Removed from Wishlist', 'info');
     } else {
-      // Wishlist logic placeholder
-      console.log('Added to wishlist');
+      // Mutual exclusivity: remove from cart before wishlisting
+      removeProductFromCart(product.id);
+      addToWishlist(product, false); // false = WishlistContext will show toast via ref
+      showToast('Added to Wishlist ❤️', 'wishlist');
     }
   };
 
@@ -87,9 +101,13 @@ const ProductCard = ({ product }) => {
       <div className="absolute top-6 right-6 z-10 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0" style={{ transform: "translateZ(40px)" }}>
         <button 
           onClick={handleWishlistClick}
-          className="w-10 h-10 rounded-full bg-background-main/80 backdrop-blur border border-border-accent flex items-center justify-center text-text-secondary hover:text-white hover:border-primary hover:bg-primary/20 transition-all"
+          className={`w-10 h-10 rounded-full bg-background-main/80 backdrop-blur border flex items-center justify-center transition-all ${
+            wishlisted 
+              ? 'border-rose-500 text-rose-500 bg-rose-500/10'
+              : 'border-border-accent text-text-secondary hover:text-rose-500 hover:border-rose-500 hover:bg-rose-500/10'
+          }`}
         >
-          <Heart size={18} />
+          <Heart size={18} fill={wishlisted ? 'currentColor' : 'none'} />
         </button>
         <button className="w-10 h-10 rounded-full bg-background-main/80 backdrop-blur border border-border-accent flex items-center justify-center text-text-secondary hover:text-white hover:border-primary hover:bg-primary/20 transition-all">
           <Eye size={18} />

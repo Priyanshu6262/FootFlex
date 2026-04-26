@@ -39,3 +39,43 @@ exports.checkStatus = async (req, res) => {
     res.status(500).json({ error: 'Failed to check status' });
   }
 };
+
+exports.getWishlist = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const user = await User.findOne({ firebaseUid: uid }).populate('wishlist');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user.wishlist);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.addToWishlist = async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const { productId } = req.body;
+    const user = await User.findOne({ firebaseUid: uid });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user.wishlist.map(id => id.toString()).includes(productId)) {
+      user.wishlist.push(productId);
+      await user.save();
+    }
+    res.json({ success: true, wishlist: user.wishlist });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.removeFromWishlist = async (req, res) => {
+  try {
+    const { uid, productId } = req.params;
+    const user = await User.findOne({ firebaseUid: uid });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    user.wishlist = user.wishlist.filter(id => id.toString() !== productId);
+    await user.save();
+    res.json({ success: true, wishlist: user.wishlist });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

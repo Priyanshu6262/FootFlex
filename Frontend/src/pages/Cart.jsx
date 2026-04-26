@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, ChevronRight, ShieldCheck, Tag, CreditCard, MapPin, Package, CheckCircle2, ChevronLeft, Plus, Phone } from 'lucide-react';
+import { Trash2, ChevronRight, ShieldCheck, Tag, CreditCard, MapPin, Package, CheckCircle2, ChevronLeft, Plus, Phone, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useWishlist } from '../context/WishlistContext';
+import { useToast } from '../context/ToastContext';
 
 const steps = ['BAG', 'ADDRESS', 'PAYMENT'];
 
 const Cart = () => {
   const { cart, cartCount, cartTotalMrp, discountTotal, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { addToWishlist, isWishlisted } = useWishlist();
+  const { showToast } = useToast();
   const [activeStep, setActiveStep] = useState(0);
   const [orderPlaced, setOrderPlaced] = useState(false);
 
@@ -143,9 +147,26 @@ const Cart = () => {
                             </div>
                           </div>
                           
-                          <button onClick={() => removeFromCart(item.cartItemId)} className="text-[#a1a1aa] hover:text-red-500 transition-colors p-2 hover:bg-red-500/10 rounded-full">
-                            <Trash2 size={18} />
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            <button onClick={() => removeFromCart(item.cartItemId)} className="text-[#a1a1aa] hover:text-red-500 transition-colors p-2 hover:bg-red-500/10 rounded-full" title="Remove">
+                              <Trash2 size={18} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                removeFromCart(item.cartItemId);
+                                addToWishlist(item, false);
+                                showToast('Moved to Wishlist ❤️', 'wishlist');
+                              }}
+                              title="Move to Wishlist"
+                              className={`p-2 rounded-full transition-all ${
+                                isWishlisted(item.id)
+                                  ? 'text-rose-500 bg-rose-500/10'
+                                  : 'text-[#a1a1aa] hover:text-rose-500 hover:bg-rose-500/10'
+                              }`}
+                            >
+                              <Heart size={18} fill={isWishlisted(item.id) ? 'currentColor' : 'none'} />
+                            </button>
+                          </div>
                         </div>
                         
                         <div className="flex justify-between items-end mt-4">

@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String },
   email: { type: String },
   isBlocked: { type: Boolean, default: false },
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   createdAt: { type: Date, default: Date.now }
 });
 

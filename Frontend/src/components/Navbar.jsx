@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AccountDropdown from './AccountDropdown';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useWishlist } from '../context/WishlistContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -13,6 +14,7 @@ const Navbar = () => {
   const location = useLocation();
   const { cartCount } = useCart();
   const { user, logout } = useAuth();
+  const { wishlistCount } = useWishlist();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -97,8 +99,13 @@ const Navbar = () => {
               onClose={() => setIsAccountOpen(false)}
             />
           </div>
-          <Link to="/wishlist" className="text-text-secondary hover:text-white transition-colors">
+          <Link to="/wishlist" className="text-text-secondary hover:text-white transition-colors relative">
             <Heart size={20} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-background-main">
+                {wishlistCount > 9 ? '9+' : wishlistCount}
+              </span>
+            )}
           </Link>
           <Link to="/cart" className="text-text-secondary hover:text-white transition-colors relative group">
             <ShoppingBag size={20} />

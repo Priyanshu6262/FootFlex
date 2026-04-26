@@ -8,12 +8,18 @@ import {
 import AddToCartButton from '../components/AddToCartButton';
 import ProductCard from '../components/ProductCard';
 import { useAuth } from '../context/AuthContext';
+import { useWishlist } from '../context/WishlistContext';
+import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { addToWishlist, removeFromWishlist, isWishlisted } = useWishlist();
+  const { removeProductFromCart } = useCart();
+  const { showToast } = useToast();
   const [product, setProduct] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -108,8 +114,15 @@ const ProductDetails = () => {
   const handleWishlistClick = () => {
     if (!user) {
       navigate('/login', { state: { from: location } });
+      return;
+    }
+    if (isWishlisted(product.id)) {
+      removeFromWishlist(product.id);
+      showToast('Removed from Wishlist', 'info');
     } else {
-      console.log('Added to wishlist');
+      removeProductFromCart(product.id); // mutual exclusivity
+      addToWishlist(product, false);
+      showToast('Added to Wishlist ❤️', 'wishlist');
     }
   };
 
@@ -179,8 +192,12 @@ const ProductDetails = () => {
                  </div>
 
                  {/* Floating Wishlist */}
-                 <button onClick={handleWishlistClick} className="absolute top-6 right-6 z-20 w-12 h-12 rounded-full bg-background-main/80 backdrop-blur border border-border-accent flex items-center justify-center text-text-secondary hover:text-rose-500 hover:border-rose-500 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)] transition-all group/btn">
-                    <Heart size={22} className="group-hover/btn:scale-110 transition-transform" />
+                 <button onClick={handleWishlistClick} className={`absolute top-6 right-6 z-20 w-12 h-12 rounded-full bg-background-main/80 backdrop-blur border flex items-center justify-center transition-all group/btn ${
+                   product && isWishlisted(product.id)
+                     ? 'border-rose-500 text-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.3)]'
+                     : 'border-border-accent text-text-secondary hover:text-rose-500 hover:border-rose-500 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)]'
+                 }`}>
+                    <Heart size={22} fill={product && isWishlisted(product.id) ? 'currentColor' : 'none'} className="group-hover/btn:scale-110 transition-transform" />
                  </button>
               </motion.div>
 
