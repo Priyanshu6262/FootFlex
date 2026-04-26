@@ -105,9 +105,16 @@ exports.createProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
-    res.status(200).json(products);
+    const limit = parseInt(req.query.limit) || 15;
+    const skip = parseInt(req.query.skip) || 0;
+    
+    const products = await Product.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const totalCount = await Product.countDocuments();
+    const hasMore = totalCount > (skip + products.length);
+
+    res.status(200).json({ products, totalCount, hasMore });
   } catch (error) {
+    console.error('Fetch Products Error:', error);
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 };

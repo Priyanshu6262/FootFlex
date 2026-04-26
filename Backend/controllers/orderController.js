@@ -10,8 +10,14 @@ exports.createOrder = async (req, res) => {
     console.log('Items:', JSON.stringify(items, null, 2));
     console.log('Amount:', amount);
     
-    // Inventory validation and deduction
     const Product = require('../models/Product');
+    const User = require('../models/User');
+
+    const user = await User.findOne({ firebaseUid: userId });
+    if (user && user.isBlocked) {
+      return res.status(403).json({ error: 'Your account is currently blocked from placing orders. Please contact support.' });
+    }
+
     for (const item of items) {
       console.log(`Checking stock for Product ID: ${item.productId}, Size: ${item.size}, Color: ${item.color}`);
       const product = await Product.findById(item.productId);
@@ -66,12 +72,11 @@ exports.createOrder = async (req, res) => {
 
 exports.getAllOrders = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+    const limit = parseInt(req.query.limit) || 15;
+    const skip = parseInt(req.query.skip) || 0;
     const { status, search } = req.query;
 
-    console.log('Admin Fetch Orders - Query:', { page, limit, status, search });
+    console.log('Admin Fetch Orders - Query:', { skip, limit, status, search });
 
     const query = {};
     if (status && status !== 'All') {
@@ -100,7 +105,7 @@ exports.getAllOrders = async (req, res) => {
     console.log(`Found ${orders.length} orders out of ${totalCount} total.`);
     res.status(200).json({ orders, totalCount, hasMore });
   } catch (error) {
-    console.error('Error fetching admin orders:', error);
+    console.error('Fetch Orders Error:', error);
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
 };
@@ -117,5 +122,68 @@ exports.updateOrderStatus = async (req, res) => {
     res.status(200).json(order);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update order status' });
+  }
+};
+
+exports.getUserOrders = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+
+    const orders = await Order.find({ userId }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const totalCount = await Order.countDocuments({ userId });
+    const hasMore = totalCount > skip + orders.length;
+
+    res.json({ orders, totalCount, hasMore });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.cancelOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    
+    if (['delivered', 'shipped', 'cancelled', 'return-requested', 'returned'].includes(order.status)) {
+      return res.status(400).json({ error: 'Order cannot be cancelled in its current state' });
+    }
+    
+    order.status = 'cancelled';
+    await order.save();
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.returnOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason, description, image, pickupAddress } = req.body;
+    
+    const order = await Order.findById(id);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    
+    if (order.status !== 'delivered') {
+      return res.status(400).json({ error: 'Only delivered orders can be returned' });
+    }
+    
+    order.status = 'return-requested';
+    order.returnRequest = {
+      reason,
+      description,
+      image,
+      pickupAddress,
+      requestedAt: new Date()
+    };
+    
+    await order.save();
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

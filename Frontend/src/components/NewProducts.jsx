@@ -15,7 +15,8 @@ const NewProducts = () => {
         if (!response.ok) throw new Error('Failed to fetch');
         const data = await response.json();
         
-        const mappedProducts = data.map(p => ({
+        const productArray = data.products || data;
+        const mappedProducts = productArray.map(p => ({
           id: p._id,
           name: p.name,
           image: `http://localhost:5000${p.imageUrl}`,

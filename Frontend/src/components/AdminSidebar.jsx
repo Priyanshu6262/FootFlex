@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, ShoppingBag, Box, Tag, Clock, Settings2
+  LayoutDashboard, ShoppingBag, Box, Tag, Clock, Settings2, Users as UsersIcon
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -12,6 +12,7 @@ const sidebarItems = [
   { id: 'add-offer',       label: 'Add Offer',        icon: Tag,            path: '/admin/add-offer' },
   { id: 'upcoming-deals',  label: 'Upcoming Deals',   icon: Clock,          path: '/admin/upcoming-deals' },
   { id: 'manage-orders',   label: 'Manage Orders',    icon: Settings2,      path: '/admin?section=manage-orders' },
+  { id: 'users',           label: 'Users',            icon: UsersIcon,      path: '/admin/users' },
 ];
 
 const AdminSidebar = ({ activeId, isMobileMenuOpen, setIsMobileMenuOpen }) => {

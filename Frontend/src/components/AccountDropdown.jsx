@@ -8,7 +8,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 
 const menuSection1 = [
-  { icon: Package,    label: 'Orders',          path: '/orders' },
+  { icon: Package,    label: 'Orders',          path: '/my-orders' },
   { icon: Heart,      label: 'Wishlist',         path: '/wishlist' },
   { icon: Gift,       label: 'Gift Cards',       path: '/gift-cards' },
   { icon: Phone,      label: 'Contact Us',       path: '/contact' },

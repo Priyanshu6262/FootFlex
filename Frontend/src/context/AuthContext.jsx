@@ -11,7 +11,33 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        try {
+          const res = await fetch('http://localhost:5000/api/users/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              firebaseUid: currentUser.uid,
+              name: currentUser.displayName,
+              email: currentUser.email
+            })
+          });
+          
+          if (res.ok) {
+            const userData = await res.json();
+            if (userData.isBlocked) {
+              alert("Your account has been blocked by the administrator.");
+              await signOut(auth);
+              setUser(null);
+              setLoading(false);
+              return;
+            }
+          }
+        } catch (error) {
+          console.error("Failed to sync user:", error);
+        }
+      }
       setUser(currentUser);
       setLoading(false);
     });

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Menu, X, ChevronRight, User } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, ChevronRight, User, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AccountDropdown from './AccountDropdown';
 import { useCart } from '../context/CartContext';
@@ -191,6 +191,10 @@ const Navbar = () => {
                <Link to="/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2 text-text-secondary hover:text-primary transition-colors">
                  <Heart size={24} />
                  <span className="text-xs">Wishlist</span>
+               </Link>
+               <Link to="/my-orders" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2 text-text-secondary hover:text-primary transition-colors">
+                 <Package size={24} />
+                 <span className="text-xs">Orders</span>
                </Link>
                <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className="flex flex-col items-center gap-2 text-text-secondary hover:text-primary transition-colors relative">
                  <div className="relative">

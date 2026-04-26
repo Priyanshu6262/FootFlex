@@ -25,7 +25,21 @@ const orderSchema = new mongoose.Schema({
   status: { 
     type: String, 
     default: 'pending', 
-    enum: ['pending', 'processing', 'shipped', 'out-for-delivery', 'delivered', 'cancelled', 'returned'] 
+    enum: ['pending', 'processing', 'shipped', 'out-for-delivery', 'delivered', 'cancelled', 'return-requested', 'returned'] 
+  },
+  returnRequest: {
+    reason: String,
+    description: String,
+    image: String,
+    pickupAddress: {
+      name: String,
+      phone: String,
+      street: String,
+      city: String,
+      state: String,
+      pincode: String
+    },
+    requestedAt: Date
   },
   razorpayOrderId: { type: String },
   razorpayPaymentId: { type: String },

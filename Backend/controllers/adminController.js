@@ -127,3 +127,80 @@ exports.getDashboardStats = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch dashboard statistics' });
   }
 };
+
+const User = require('../models/User');
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 15;
+    const skip = parseInt(req.query.skip) || 0;
+
+    const users = await User.find().skip(skip).limit(limit).sort({ createdAt: -1 });
+    const totalCount = await User.countDocuments();
+    
+    // For each user, we need to calculate their orders
+    const usersWithStats = await Promise.all(users.map(async (u) => {
+      const userOrders = await Order.find({ userId: u.firebaseUid });
+      
+      let totalOrders = userOrders.length;
+      let cancelledReturned = 0;
+      let totalSales = 0;
+
+      userOrders.forEach(o => {
+        const s = (o.status || '').toLowerCase();
+        if (s === 'delivered') totalSales += (o.amount || 0);
+        if (s === 'cancelled' || s === 'returned') cancelledReturned++;
+      });
+
+      return {
+        _id: u._id,
+        firebaseUid: u.firebaseUid,
+        name: u.name,
+        email: u.email,
+        isBlocked: u.isBlocked,
+        totalOrders,
+        totalSales,
+        cancelledReturned
+      };
+    }));
+
+    res.status(200).json({
+      users: usersWithStats,
+      totalCount,
+      hasMore: (skip + limit) < totalCount
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+};
+
+exports.toggleBlockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+    
+    res.status(200).json({ message: 'User block status updated', isBlocked: user.isBlocked });
+  } catch (error) {
+    console.error('Error toggling user block status:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+};
+
+exports.getUserOrders = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const orders = await Order.find({ userId: user.firebaseUid }).sort({ createdAt: -1 });
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    res.status(500).json({ error: 'Failed to fetch user orders' });
+  }
+};

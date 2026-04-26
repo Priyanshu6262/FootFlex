@@ -128,7 +128,7 @@ const DashboardView = () => {
 const AllOrdersView = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [filterStatus, setFilterStatus] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -136,19 +136,33 @@ const AllOrdersView = () => {
 
   const statusFilters = ['All', 'pending', 'processing', 'shipped', 'out-for-delivery', 'delivered', 'cancelled', 'returned'];
 
-  const fetchOrders = async (pageNum = 1, status = 'All', search = '') => {
-    setLoading(true);
+  const fetchOrders = async (currentSkip = 0, currentLimit = 15, status = filterStatus, search = searchQuery, isLoadMore = false) => {
+    if (isLoadMore) setLoadingMore(true);
+    else if (currentSkip === 0 && !isLoadMore) setLoading(true);
+
     try {
       const token = localStorage.getItem('adminToken');
       const statusParam = status !== 'All' ? `&status=${status}` : '';
       const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
-      const res = await fetch(`http://localhost:5000/api/orders/admin?page=${pageNum}${statusParam}${searchParam}`, {
+      const res = await fetch(`http://localhost:5000/api/orders/admin?skip=${currentSkip}&limit=${currentLimit}${statusParam}${searchParam}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
         const data = await res.json();
-        if (pageNum === 1) setOrders(data.orders);
-        else setOrders(prev => [...prev, ...data.orders]);
+        if (isLoadMore) {
+          setOrders(prev => {
+            const newOrders = [...prev, ...data.orders];
+            // Remove duplicates just in case
+            const uniqueIds = new Set();
+            return newOrders.filter(o => {
+              if (uniqueIds.has(o._id)) return false;
+              uniqueIds.add(o._id);
+              return true;
+            });
+          });
+        } else {
+          setOrders(data.orders);
+        }
         setHasMore(data.hasMore);
       }
     } catch (error) {
@@ -156,19 +170,23 @@ const AllOrdersView = () => {
       alert('Failed to load orders. Please check if you are logged in as admin.');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
   useEffect(() => { 
-    setPage(1);
-    
     const timeoutId = setTimeout(() => {
-      fetchOrders(1, filterStatus, searchQuery); 
+      fetchOrders(0, 15, filterStatus, searchQuery, false); 
     }, 500);
 
     // Polling every 10 seconds for real-time order updates
+    // It fetches from 0 up to current loaded length to prevent list shrinking
     const interval = setInterval(() => {
-      fetchOrders(1, filterStatus, searchQuery); // Fetch latest orders for current filter
+      setOrders(currentOrders => {
+        const currentLimit = Math.max(15, currentOrders.length);
+        fetchOrders(0, currentLimit, filterStatus, searchQuery, false);
+        return currentOrders;
+      });
     }, 10000);
     
     return () => {
@@ -178,9 +196,11 @@ const AllOrdersView = () => {
   }, [filterStatus, searchQuery]);
 
   const handleShowMore = () => {
-    const next = page + 1;
-    setPage(next);
-    fetchOrders(next, filterStatus, searchQuery);
+    if (!hasMore) return;
+    const newSkip = orders.length;
+    // As per requirement: First load -> 15. Next -> +25. Next -> +35
+    const limit = newSkip === 15 ? 25 : 35;
+    fetchOrders(newSkip, limit, filterStatus, searchQuery, true);
   };
 
   const updateStatus = async (orderId, newStatus) => {
@@ -239,11 +259,11 @@ const AllOrdersView = () => {
       </div>
 
       {/* Table View for Orders */}
-      <div className="bg-background-card border border-border-accent rounded-3xl overflow-hidden shadow-2xl">
-        <div className="overflow-x-auto">
+      <div className="bg-background-card border border-border-accent rounded-3xl overflow-hidden shadow-2xl relative max-h-[600px] flex flex-col">
+        <div className="overflow-y-auto overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse min-w-[800px]">
-            <thead>
-              <tr className="bg-white/5 border-b border-border-accent/50 text-xs text-text-muted font-bold uppercase tracking-wider">
+            <thead className="sticky top-0 z-10 bg-background-card border-b border-border-accent/50 shadow-sm">
+              <tr className="text-xs text-text-muted font-bold uppercase tracking-wider">
                 <th className="p-5 pl-8">Order ID</th>
                 <th className="p-5">Product</th>
                 <th className="p-5">Price</th>
@@ -329,7 +349,7 @@ const AllOrdersView = () => {
           </table>
 
           {orders.length === 0 && !loading && (
-            <div className="w-full flex flex-col items-center justify-center py-24 text-text-muted bg-background-main/50">
+            <div className="w-full flex flex-col items-center justify-center py-24 text-text-muted bg-background-main/50 absolute inset-x-0 bottom-0 top-[60px]">
               <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
                 <X size={24} />
               </div>
@@ -337,18 +357,31 @@ const AllOrdersView = () => {
             </div>
           )}
         </div>
-      </div>
 
-      {hasMore && orders.length > 0 && (
-        <div className="flex justify-center mt-2">
-          <button
-            onClick={handleShowMore}
-            className="px-10 py-4 bg-primary/10 text-primary border border-primary/20 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-primary/20"
-          >
-            {loading ? 'Processing...' : 'Load More Orders'}
-          </button>
-        </div>
-      )}
+        {/* Loading Indicator for progressive load */}
+        {loadingMore && (
+          <div className="flex justify-center items-center py-6 border-t border-border-accent/30 bg-background-card">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+
+        {/* Show More / No More Data Footer */}
+        {!loading && orders.length > 0 && (
+          <div className="flex justify-center items-center py-6 border-t border-border-accent/30 bg-background-card sticky bottom-0 z-10">
+            {hasMore ? (
+              <button
+                onClick={handleShowMore}
+                disabled={loadingMore}
+                className="px-10 py-3 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-primary/20 disabled:opacity-50"
+              >
+                {loadingMore ? 'Loading...' : 'Show More'}
+              </button>
+            ) : (
+              <span className="text-text-muted text-xs font-bold uppercase tracking-widest">No more data available</span>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* View Details Modal */}
       <AnimatePresence>

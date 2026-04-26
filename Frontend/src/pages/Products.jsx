@@ -16,7 +16,8 @@ const Products = () => {
         const data = await response.json();
         
         // Map backend data to ProductCard format
-        const mappedProducts = data.map(p => ({
+        const productArray = data.products || data;
+        const mappedProducts = productArray.map(p => ({
           id: p._id,
           name: p.name,
           image: `http://localhost:5000${p.imageUrl}`,

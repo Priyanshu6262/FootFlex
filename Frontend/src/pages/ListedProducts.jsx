@@ -232,16 +232,34 @@ const ListedProducts = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
-  const fetchProducts = async () => {
-    setLoading(true);
+  const fetchProducts = async (currentSkip = 0, currentLimit = 15, isLoadMore = false) => {
+    if (isLoadMore) setLoadingMore(true);
+    else if (currentSkip === 0 && !isLoadMore) setLoading(true);
+
     try {
-      const res = await fetch('http://localhost:5000/api/products');
+      const res = await fetch(`http://localhost:5000/api/products?skip=${currentSkip}&limit=${currentLimit}`);
       if (res.ok) {
         const data = await res.json();
-        setProducts(data);
+        // Since we updated productController.getAllProducts to return { products, totalCount, hasMore }
+        if (isLoadMore) {
+          setProducts(prev => {
+            const newProducts = [...prev, ...data.products];
+            const uniqueIds = new Set();
+            return newProducts.filter(p => {
+              if (uniqueIds.has(p._id)) return false;
+              uniqueIds.add(p._id);
+              return true;
+            });
+          });
+        } else {
+          setProducts(data.products);
+        }
+        setHasMore(data.hasMore);
       } else {
         console.error('Failed to fetch products, status:', res.status);
       }
@@ -249,14 +267,23 @@ const ListedProducts = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
       console.error('Fetch error:', err);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) { navigate('/admin/login'); return; }
-    fetchProducts();
+    fetchProducts(0, 15, false);
   }, []);
+
+  const handleShowMore = () => {
+    if (!hasMore) return;
+    const newSkip = products.length;
+    // As per requirement: First load -> 15. Next -> +25. Next -> +35
+    const limit = newSkip === 15 ? 25 : 35;
+    fetchProducts(newSkip, limit, true);
+  };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this product?')) return;
@@ -301,11 +328,11 @@ const ListedProducts = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="bg-background-card border border-border-accent rounded-3xl overflow-hidden shadow-xl">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-background-main border-b border-border-accent">
+          <div className="bg-background-card border border-border-accent rounded-3xl overflow-hidden shadow-xl relative max-h-[600px] flex flex-col">
+            <div className="overflow-y-auto overflow-x-auto custom-scrollbar">
+              <table className="w-full text-left border-collapse min-w-[800px]">
+                <thead className="sticky top-0 z-10 bg-background-card border-b border-border-accent/50 shadow-sm">
+                  <tr>
                     <th className="px-6 py-4 text-[#a1a1aa] text-xs uppercase font-bold tracking-wider">Product</th>
                     <th className="px-6 py-4 text-[#a1a1aa] text-xs uppercase font-bold tracking-wider">Category</th>
                     <th className="px-6 py-4 text-[#a1a1aa] text-xs uppercase font-bold tracking-wider">Price</th>
@@ -348,6 +375,30 @@ const ListedProducts = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
                 </tbody>
               </table>
             </div>
+            
+            {/* Loading Indicator for progressive load */}
+            {loadingMore && (
+              <div className="flex justify-center items-center py-6 border-t border-border-accent/30 bg-background-card">
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+
+            {/* Show More / No More Data Footer */}
+            {!loading && products.length > 0 && (
+              <div className="flex justify-center items-center py-6 border-t border-border-accent/30 bg-background-card sticky bottom-0 z-10">
+                {hasMore ? (
+                  <button
+                    onClick={handleShowMore}
+                    disabled={loadingMore}
+                    className="px-10 py-3 bg-primary/10 text-primary border border-primary/20 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-lg hover:shadow-primary/20 disabled:opacity-50"
+                  >
+                    {loadingMore ? 'Loading...' : 'Show More'}
+                  </button>
+                ) : (
+                  <span className="text-text-muted text-xs font-bold uppercase tracking-widest">No more data available</span>
+                )}
+              </div>
+            )}
           </div>
         )}
 
