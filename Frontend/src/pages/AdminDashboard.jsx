@@ -8,7 +8,7 @@ import {
 } from 'recharts';
 import {
   ShoppingBag, CheckCircle2, Truck, Package,
-  LayoutDashboard, TrendingUp, Eye, Clock, Filter, X
+  LayoutDashboard, TrendingUp, Eye, Clock, Filter, X, Search
 } from 'lucide-react';
 import AdminSidebar from '../components/AdminSidebar';
 
@@ -131,15 +131,18 @@ const AllOrdersView = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [filterStatus, setFilterStatus] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const statusFilters = ['All', 'pending', 'processing', 'shipped', 'out-for-delivery', 'delivered', 'cancelled', 'returned'];
 
-  const fetchOrders = async (pageNum = 1, status = 'All') => {
+  const fetchOrders = async (pageNum = 1, status = 'All', search = '') => {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
       const statusParam = status !== 'All' ? `&status=${status}` : '';
-      const res = await fetch(`http://localhost:5000/api/orders/admin?page=${pageNum}${statusParam}`, {
+      const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
+      const res = await fetch(`http://localhost:5000/api/orders/admin?page=${pageNum}${statusParam}${searchParam}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -158,19 +161,26 @@ const AllOrdersView = () => {
 
   useEffect(() => { 
     setPage(1);
-    fetchOrders(1, filterStatus); 
+    
+    const timeoutId = setTimeout(() => {
+      fetchOrders(1, filterStatus, searchQuery); 
+    }, 500);
 
     // Polling every 10 seconds for real-time order updates
     const interval = setInterval(() => {
-      fetchOrders(1, filterStatus); // Fetch latest orders for current filter
+      fetchOrders(1, filterStatus, searchQuery); // Fetch latest orders for current filter
     }, 10000);
-    return () => clearInterval(interval);
-  }, [filterStatus]);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(interval);
+    };
+  }, [filterStatus, searchQuery]);
 
   const handleShowMore = () => {
     const next = page + 1;
     setPage(next);
-    fetchOrders(next, filterStatus);
+    fetchOrders(next, filterStatus, searchQuery);
   };
 
   const updateStatus = async (orderId, newStatus) => {
@@ -190,125 +200,140 @@ const AllOrdersView = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
         <div>
           <h2 className="text-3xl font-bold text-white mb-1">Order Management</h2>
           <p className="text-text-muted">Track and manage customer orders across the platform.</p>
         </div>
         
-        {/* Horizontal Status Filters */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
-          {statusFilters.map(status => (
-            <button
-              key={status}
-              onClick={() => setFilterStatus(status)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
-                filterStatus === status
-                  ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
-                  : 'bg-background-card text-text-secondary border-border-accent hover:border-primary/50'
-              }`}
-            >
-              {status === 'All' ? 'All Orders' : status.charAt(0).toUpperCase() + status.slice(1)}
-            </button>
-          ))}
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          {/* Search Bar */}
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+            <input 
+              type="text"
+              placeholder="Search Order ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-background-card border border-border-accent rounded-xl py-3 pl-12 pr-4 text-sm text-white focus:border-primary outline-none transition-all"
+            />
+          </div>
+
+          {/* Horizontal Status Filters */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide w-full">
+            {statusFilters.map(status => (
+              <button
+                key={status}
+                onClick={() => setFilterStatus(status)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+                  filterStatus === status
+                    ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                    : 'bg-background-card text-text-secondary border-border-accent hover:border-primary/50'
+                }`}
+              >
+                {status === 'All' ? 'All Orders' : status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Horizontal View for Orders */}
-      <div className="relative group">
-        <style>{`.orders-scroll::-webkit-scrollbar { display: none; }`}</style>
-        <div className="orders-scroll flex overflow-x-auto gap-6 pb-12 snap-x px-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          {orders.map((order, idx) => {
-            const item         = order.items?.[0] ?? {};
-            const displayPrice = order.amount ? `₹${Number(order.amount).toFixed(2)}` : (item.price ? `₹${Number(item.price).toFixed(2)}` : 'N/A');
-            const totalQty     = order.items?.reduce((acc, curr) => acc + (Number(curr.quantity) || 1), 0) || (Number(item.quantity) || 0);
-            const displayQty   = `${totalQty} item${totalQty !== 1 ? 's' : ''}`;
-            const userName     = order.shippingAddress?.name || 'Unknown User';
-            const orderDate    = new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-            
-            // Normalize status to lowercase and handle "initiated"
-            let normalizedStatus = (order.status || 'pending').toLowerCase();
-            if (normalizedStatus === 'initiated') normalizedStatus = 'pending';
+      {/* Table View for Orders */}
+      <div className="bg-background-card border border-border-accent rounded-3xl overflow-hidden shadow-2xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[800px]">
+            <thead>
+              <tr className="bg-white/5 border-b border-border-accent/50 text-xs text-text-muted font-bold uppercase tracking-wider">
+                <th className="p-5 pl-8">Order ID</th>
+                <th className="p-5">Product</th>
+                <th className="p-5">Price</th>
+                <th className="p-5 text-center">Qty</th>
+                <th className="p-5 text-center">Status</th>
+                <th className="p-5 pr-8 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border-accent/30">
+              {orders.map((order, idx) => {
+                const item = order.items?.[0] ?? {};
+                const displayPrice = order.amount ? `₹${Number(order.amount).toFixed(2)}` : (item.price ? `₹${Number(item.price).toFixed(2)}` : 'N/A');
+                const totalQty = order.items?.reduce((acc, curr) => acc + (Number(curr.quantity) || 1), 0) || (Number(item.quantity) || 0);
+                
+                let normalizedStatus = (order.status || 'pending').toLowerCase();
+                if (normalizedStatus === 'initiated') normalizedStatus = 'pending';
 
-            return (
-              <motion.div
-                key={order._id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.05 }}
-                className="min-w-[340px] md:min-w-[380px] bg-background-card border border-border-accent p-8 rounded-[3rem] shadow-2xl snap-center flex flex-col gap-6 relative overflow-hidden transition-all hover:border-primary/30"
-              >
-                {/* Background ID Glow */}
-                <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-
-                <div className="flex justify-between items-start z-10">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] text-primary font-black uppercase tracking-widest mb-1">Order #{order._id.slice(-8).toUpperCase()}</span>
-                    <span className="text-white font-bold text-sm">{userName}</span>
-                    <span className="text-text-muted text-xs mt-0.5">{orderDate}</span>
-                  </div>
-                  <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter ${
-                    normalizedStatus === 'delivered' ? 'bg-emerald-500/10 text-emerald-400' :
-                    normalizedStatus === 'processing' ? 'bg-blue-500/10 text-blue-400' :
-                    normalizedStatus === 'cancelled' ? 'bg-red-500/10 text-red-400' : 
-                    normalizedStatus === 'shipped' ? 'bg-purple-500/10 text-purple-400' : 'bg-primary/10 text-primary'
-                  }`}>
-                    {normalizedStatus}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-5 py-4 border-y border-border-accent/30 z-10">
-                  <div className="w-20 h-20 rounded-2xl bg-background-main border border-border-accent p-2 flex items-center justify-center">
-                    <img src={item.image} alt="" className="w-full h-full object-contain mix-blend-lighten" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-white font-bold text-base line-clamp-1">{item.name || 'Multiple Items'}</h4>
-                    <p className="text-text-muted text-xs font-semibold">{displayQty} · <span className="text-primary">{displayPrice}</span></p>
-                    <div className="flex items-center gap-2 mt-1">
-                      {item.color && <div className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: item.color }} />}
-                      {item.size && <span className="text-[10px] text-text-muted font-bold uppercase tracking-widest">Size {item.size}</span>}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-5 z-10">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[10px] font-black text-text-muted uppercase tracking-[0.2em] px-1">Quick Action</label>
-                    <div className="relative group/select">
-                      <select
-                        value={normalizedStatus}
-                        onChange={(e) => updateStatus(order._id, e.target.value)}
-                        className="w-full bg-background-main border border-border-accent rounded-2xl px-5 py-3.5 text-xs text-white font-bold focus:border-primary outline-none appearance-none cursor-pointer transition-all hover:bg-white/5"
-                      >
-                        {['pending', 'processing', 'shipped', 'out-for-delivery', 'delivered', 'cancelled', 'returned'].map(s => (
-                          <option key={s} value={s}>{s.replace(/-/g, ' ').charAt(0).toUpperCase() + s.replace(/-/g, ' ').slice(1)}</option>
-                        ))}
-                      </select>
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted group-hover/select:text-primary transition-colors">
-                        <Filter size={14} />
+                return (
+                  <motion.tr 
+                    key={order._id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="hover:bg-white/5 transition-colors group/row"
+                  >
+                    <td className="p-5 pl-8">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-white group-hover/row:text-primary transition-colors">#{order._id.slice(-8).toUpperCase()}</span>
+                        <span className="text-xs text-text-muted mt-1">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <button className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3.5 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-wider hover:bg-primary-hover transition-all shadow-lg shadow-primary/20">
-                      <Eye size={16} /> Details
-                    </button>
-                    <button className="p-3.5 bg-background-main border border-border-accent text-text-muted hover:text-white hover:border-white/20 rounded-2xl transition-all">
-                      <Clock size={16} />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+                    </td>
+                    <td className="p-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-background-main border border-border-accent p-2 flex shrink-0">
+                          <img src={item.image} alt="" className="w-full h-full object-contain mix-blend-lighten" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-white line-clamp-1">{item.name || 'Multiple Items'}</p>
+                          <p className="text-xs text-text-muted mt-1">{order.shippingAddress?.name || 'Unknown User'}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-5">
+                      <span className="text-sm font-bold text-primary">{displayPrice}</span>
+                    </td>
+                    <td className="p-5 text-center">
+                      <span className="text-sm font-bold text-white bg-white/10 px-3 py-1 rounded-lg">{totalQty}</span>
+                    </td>
+                    <td className="p-5 text-center">
+                      <div className="relative inline-block w-36">
+                        <select
+                          value={normalizedStatus}
+                          onChange={(e) => updateStatus(order._id, e.target.value)}
+                          className={`w-full appearance-none border rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-wider outline-none cursor-pointer transition-all ${
+                            normalizedStatus === 'delivered' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                            normalizedStatus === 'processing' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                            normalizedStatus === 'cancelled' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 
+                            normalizedStatus === 'shipped' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 
+                            'bg-primary/10 text-primary border-primary/20'
+                          }`}
+                        >
+                          {['pending', 'processing', 'shipped', 'out-for-delivery', 'delivered', 'cancelled', 'returned'].map(s => (
+                            <option key={s} value={s} className="bg-background-card text-white">{s.replace(/-/g, ' ').toUpperCase()}</option>
+                          ))}
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                          <Filter size={12} />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-5 pr-8 text-right">
+                      <button 
+                        onClick={() => setSelectedOrder(order)}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-background-main border border-border-accent text-white rounded-xl text-xs font-bold hover:border-primary hover:text-primary transition-all"
+                      >
+                        <Eye size={14} /> Details
+                      </button>
+                    </td>
+                  </motion.tr>
+                );
+              })}
+            </tbody>
+          </table>
 
           {orders.length === 0 && !loading && (
-            <div className="w-full flex flex-col items-center justify-center py-20 text-text-muted bg-background-card/20 rounded-[3rem] border border-dashed border-border-accent min-w-[300px]">
+            <div className="w-full flex flex-col items-center justify-center py-24 text-text-muted bg-background-main/50">
               <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
                 <X size={24} />
               </div>
-              <p className="font-bold">No orders found for "{filterStatus}"</p>
+              <p className="font-bold">No orders found for your search/filter</p>
             </div>
           )}
         </div>
@@ -324,6 +349,113 @@ const AllOrdersView = () => {
           </button>
         </div>
       )}
+
+      {/* View Details Modal */}
+      <AnimatePresence>
+        {selectedOrder && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setSelectedOrder(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-background-card border border-border-accent rounded-[2rem] shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto"
+            >
+              <div className="p-8 border-b border-border-accent sticky top-0 bg-background-card/90 backdrop-blur-md z-10 flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-black text-white">Order Details</h3>
+                  <p className="text-sm text-text-muted mt-1 font-mono tracking-widest uppercase">ID: {selectedOrder._id}</p>
+                </div>
+                <button 
+                  onClick={() => setSelectedOrder(null)}
+                  className="p-3 bg-background-main border border-border-accent rounded-full text-text-muted hover:text-white hover:border-white/20 transition-all"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="p-8 space-y-8">
+                {/* Customer & Shipping Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-background-main border border-border-accent rounded-2xl p-6">
+                    <h4 className="text-xs font-black text-text-muted uppercase tracking-widest mb-4">Customer Info</h4>
+                    <p className="text-white font-bold">{selectedOrder.shippingAddress?.name || 'Unknown User'}</p>
+                    <p className="text-text-secondary text-sm mt-1">{selectedOrder.user?.email || 'Guest Checkout'}</p>
+                    <p className="text-text-secondary text-sm mt-1">Phone: {selectedOrder.shippingAddress?.phone || 'N/A'}</p>
+                  </div>
+                  <div className="bg-background-main border border-border-accent rounded-2xl p-6">
+                    <h4 className="text-xs font-black text-text-muted uppercase tracking-widest mb-4">Shipping Address</h4>
+                    <p className="text-white font-bold">{selectedOrder.shippingAddress?.address || 'N/A'}</p>
+                    <p className="text-text-secondary text-sm mt-1">
+                      {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.state} {selectedOrder.shippingAddress?.zip}
+                    </p>
+                    <p className="text-text-secondary text-sm mt-1">{selectedOrder.shippingAddress?.country || 'India'}</p>
+                  </div>
+                </div>
+
+                {/* Items List */}
+                <div>
+                  <h4 className="text-xs font-black text-text-muted uppercase tracking-widest mb-4">Ordered Items</h4>
+                  <div className="space-y-4">
+                    {selectedOrder.items?.map((item, index) => (
+                      <div key={index} className="flex items-center gap-6 bg-background-main border border-border-accent rounded-2xl p-4">
+                        <div className="w-20 h-20 rounded-xl bg-white/5 border border-border-accent p-2 shrink-0">
+                          <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-lighten" />
+                        </div>
+                        <div className="flex-1">
+                          <h5 className="text-white font-bold text-lg">{item.name}</h5>
+                          <div className="flex items-center gap-4 mt-2">
+                            <span className="text-xs font-bold text-text-muted">QTY: {item.quantity || 1}</span>
+                            {item.size && <span className="text-xs font-bold text-text-muted">SIZE: {item.size}</span>}
+                            {item.color && (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs font-bold text-text-muted">COLOR:</span>
+                                <div className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: item.color }} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xl font-black text-primary">₹{Number(item.price).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Summary */}
+                <div className="bg-background-main border border-border-accent rounded-2xl p-6">
+                  <h4 className="text-xs font-black text-text-muted uppercase tracking-widest mb-4">Payment & Summary</h4>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary">Payment Method</span>
+                      <span className="text-white font-bold uppercase">{selectedOrder.paymentMethod || 'Online'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-text-secondary">Order Date</span>
+                      <span className="text-white font-bold">
+                        {new Date(selectedOrder.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </span>
+                    </div>
+                    <div className="h-px bg-border-accent/50 my-2" />
+                    <div className="flex justify-between items-center">
+                      <span className="text-text-muted font-bold uppercase tracking-widest">Total Amount</span>
+                      <span className="text-2xl font-black text-primary">₹{Number(selectedOrder.amount).toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

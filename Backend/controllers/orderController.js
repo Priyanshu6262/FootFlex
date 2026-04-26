@@ -69,9 +69,9 @@ exports.getAllOrders = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const { status } = req.query;
+    const { status, search } = req.query;
 
-    console.log('Admin Fetch Orders - Query:', { page, limit, status });
+    console.log('Admin Fetch Orders - Query:', { page, limit, status, search });
 
     const query = {};
     if (status && status !== 'All') {
@@ -80,6 +80,17 @@ exports.getAllOrders = async (req, res) => {
       } else {
         query.status = { $regex: new RegExp(`^${status}$`, 'i') };
       }
+    }
+    
+    if (search && search.trim() !== '') {
+      // Partial matching for MongoDB ObjectId by converting to string
+      query.$expr = {
+        $regexMatch: {
+          input: { $toString: "$_id" },
+          regex: search.trim(),
+          options: "i"
+        }
+      };
     }
     
     const orders = await Order.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
