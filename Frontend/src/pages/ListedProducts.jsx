@@ -26,7 +26,7 @@ const ProductForm = ({ initialData, onCancel, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRemovingBg, setIsRemovingBg] = useState(false);
   const [previewImage, setPreviewImage] = useState(
-    initialData?.imageUrl ? `${API_URL}${initialData.imageUrl}` : null
+    initialData?.imageUrl ? initialData.imageUrl?.startsWith('http') ? initialData.imageUrl : `${API_URL}${initialData.imageUrl}` : null
   );
 
   const categories = ['Running Shoes', 'Casual Shoes', 'Sports Shoes', 'Formal Shoes'];
@@ -348,7 +348,7 @@ const ListedProducts = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
                         <div className="flex items-center gap-4">
                           <div className="w-16 h-16 rounded-2xl overflow-hidden bg-background-main border border-border-accent shrink-0">
                             {product.imageUrl
-                              ? <img src={`${API_URL}${product.imageUrl}`} alt={product.name} className="w-full h-full object-cover" />
+                              ? <img src={product.imageUrl?.startsWith('http') ? product.imageUrl : `${API_URL}${product.imageUrl}`} alt={product.name} className="w-full h-full object-cover" />
                               : <div className="w-full h-full flex items-center justify-center text-xs text-text-muted">No Img</div>
                             }
                           </div>
@@ -436,4 +436,5 @@ const ListedProducts = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
 };
 
 export default ListedProducts;
+
 

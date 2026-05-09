@@ -20,7 +20,7 @@ const NewProducts = () => {
         const mappedProducts = productArray.map(p => ({
           id: p._id,
           name: p.name,
-          image: `${API_URL}${p.imageUrl}`,
+          image: p.imageUrl?.startsWith('http') ? p.imageUrl : `${API_URL}${p.imageUrl}`,
           price: p.price,
           discount: p.discount,
           category: p.gender,
@@ -106,6 +106,7 @@ const NewProducts = () => {
 };
 
 export default NewProducts;
+
 
 
 

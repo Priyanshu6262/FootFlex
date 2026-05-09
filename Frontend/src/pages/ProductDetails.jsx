@@ -43,7 +43,7 @@ const ProductDetails = () => {
         const mappedProduct = {
           id: p._id,
           name: p.name,
-          image: `${API_URL}${p.imageUrl}`,
+          image: p.imageUrl?.startsWith('http') ? p.imageUrl : `${API_URL}${p.imageUrl}`,
           price: p.price,
           discount: p.discount,
           category: p.gender,
@@ -70,7 +70,7 @@ const ProductDetails = () => {
            const mappedSimilar = allProducts.map(sp => ({
               id: sp._id,
               name: sp.name,
-              image: `${API_URL}${sp.imageUrl}`,
+              image: sp.imageUrl?.startsWith('http') ? sp.imageUrl : `${API_URL}${sp.imageUrl}`,
               price: sp.price,
               discount: sp.discount,
               category: sp.gender,
@@ -502,4 +502,5 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+
 

@@ -31,7 +31,7 @@ const Men = () => {
         const mappedProducts = productArray.map(p => ({
           id: p._id,
           name: p.name,
-          image: `${API_URL}${p.imageUrl}`,
+          image: p.imageUrl?.startsWith('http') ? p.imageUrl : `${API_URL}${p.imageUrl}`,
           price: p.price,
           discount: p.discount,
           category: p.gender, // keeping category as gender for filter compatibility if needed, though product.category might be better
@@ -255,4 +255,5 @@ const Men = () => {
 };
 
 export default Men;
+
 

@@ -20,7 +20,7 @@ export const WishlistProvider = ({ children }) => {
   const mapProduct = (p) => ({
     id: p._id,
     name: p.name,
-    image: p.imageUrl?.startsWith('http') ? p.imageUrl : `${API_URL}${p.imageUrl}`,
+    image: p.imageUrl?.startsWith('http') ? p.imageUrl : p.imageUrl?.startsWith('http') ? p.imageUrl : `${API_URL}${p.imageUrl}`,
     price: p.price,
     discount: p.discount,
     gender: p.gender,
@@ -134,6 +134,7 @@ export const useWishlist = () => {
   if (!context) throw new Error('useWishlist must be used within a WishlistProvider');
   return context;
 };
+
 
 
 
