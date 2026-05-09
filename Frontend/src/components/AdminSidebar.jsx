@@ -77,3 +77,4 @@ const AdminSidebar = ({ activeId, isMobileMenuOpen, setIsMobileMenuOpen }) => {
 };
 
 export default AdminSidebar;
+

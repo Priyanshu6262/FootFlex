@@ -61,3 +61,4 @@ const AdminNavbar = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
 };
 
 export default AdminNavbar;
+

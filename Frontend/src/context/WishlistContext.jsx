@@ -1,4 +1,4 @@
-import API_URL from '../../config/api';
+import API_URL from '../config/api';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 
@@ -134,5 +134,6 @@ export const useWishlist = () => {
   if (!context) throw new Error('useWishlist must be used within a WishlistProvider');
   return context;
 };
+
 
 

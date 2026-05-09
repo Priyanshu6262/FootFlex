@@ -179,3 +179,4 @@ const AddToCartButton = ({ product, size, color }) => {
 };
 
 export default AddToCartButton;
+

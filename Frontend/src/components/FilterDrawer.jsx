@@ -183,3 +183,4 @@ const FilterDrawer = ({ isOpen, onClose, activeFilters, onFilterChange }) => {
 };
 
 export default FilterDrawer;
+

@@ -76,3 +76,4 @@ const SortDropdown = ({ sortBy, onSortChange }) => {
 };
 
 export default SortDropdown;
+

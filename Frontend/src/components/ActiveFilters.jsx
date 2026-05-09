@@ -94,3 +94,4 @@ const FilterChip = ({ label, onRemove }) => (
 );
 
 export default ActiveFilters;
+

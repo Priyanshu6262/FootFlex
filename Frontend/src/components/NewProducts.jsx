@@ -1,4 +1,4 @@
-import API_URL from '../../config/api';
+import API_URL from '../config/api';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
@@ -106,5 +106,6 @@ const NewProducts = () => {
 };
 
 export default NewProducts;
+
 
 

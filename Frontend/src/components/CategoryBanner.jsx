@@ -173,3 +173,4 @@ const CategoryBanner = ({ title, description, offers, upcomingDeals = [], newLau
 };
 
 export default CategoryBanner;
+

@@ -1,4 +1,4 @@
-import API_URL from '../../config/api';
+import API_URL from '../config/api';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
@@ -77,5 +77,6 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
 
 

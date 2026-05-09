@@ -139,3 +139,4 @@ const FilterSidebar = ({ activeFilters, onFilterChange }) => {
 };
 
 export default FilterSidebar;
+
