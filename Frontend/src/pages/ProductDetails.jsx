@@ -1,3 +1,4 @@
+import API_URL from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -35,14 +36,14 @@ const ProductDetails = () => {
     const fetchProductData = async () => {
       try {
         // Fetch current product
-        const response = await fetch(`http://localhost:5000/api/products/${id}`);
+        const response = await fetch(`${API_URL}/api/products/${id}`);
         if (!response.ok) throw new Error('Product not found');
         const p = await response.json();
         
         const mappedProduct = {
           id: p._id,
           name: p.name,
-          image: `http://localhost:5000${p.imageUrl}`,
+          image: `${API_URL}${p.imageUrl}`,
           price: p.price,
           discount: p.discount,
           category: p.gender,
@@ -63,13 +64,13 @@ const ProductDetails = () => {
         if (mappedProduct.colors && mappedProduct.colors.length > 0) setSelectedColor(mappedProduct.colors[0]);
 
         // Fetch similar products
-        const allRes = await fetch('http://localhost:5000/api/products');
+        const allRes = await fetch('${API_URL}/api/products');
         if (allRes.ok) {
            const allProducts = await allRes.json();
            const mappedSimilar = allProducts.map(sp => ({
               id: sp._id,
               name: sp.name,
-              image: `http://localhost:5000${sp.imageUrl}`,
+              image: `${API_URL}${sp.imageUrl}`,
               price: sp.price,
               discount: sp.discount,
               category: sp.gender,
@@ -501,3 +502,4 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+

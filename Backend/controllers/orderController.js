@@ -76,8 +76,6 @@ exports.getAllOrders = async (req, res) => {
     const skip = parseInt(req.query.skip) || 0;
     const { status, search } = req.query;
 
-    console.log('Admin Fetch Orders - Query:', { skip, limit, status, search });
-
     const query = {};
     if (status && status !== 'All') {
       if (status.toLowerCase() === 'pending') {
@@ -102,7 +100,6 @@ exports.getAllOrders = async (req, res) => {
     const totalCount = await Order.countDocuments(query);
     const hasMore = totalCount > (skip + orders.length);
     
-    console.log(`Found ${orders.length} orders out of ${totalCount} total.`);
     res.status(200).json({ orders, totalCount, hasMore });
   } catch (error) {
     console.error('Fetch Orders Error:', error);

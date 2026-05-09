@@ -1,3 +1,4 @@
+import API_URL from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +39,7 @@ const MyOrders = () => {
 
   const fetchOrders = async (pageNum = 1) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/user/${user.uid}?page=${pageNum}&limit=5`);
+      const res = await fetch(`${API_URL}/api/orders/user/${user.uid}?page=${pageNum}&limit=5`);
       if (res.ok) {
         const data = await res.json();
         if (pageNum === 1) {
@@ -65,7 +66,7 @@ const MyOrders = () => {
   const handleCancelOrder = async (orderId) => {
     if (!window.confirm('Are you sure you want to cancel this order?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/cancel`, { method: 'PUT' });
+      const res = await fetch(`${API_URL}/api/orders/${orderId}/cancel`, { method: 'PUT' });
       if (res.ok) {
         setOrders(orders.map(o => o._id === orderId ? { ...o, status: 'cancelled' } : o));
       } else {
@@ -109,7 +110,7 @@ const MyOrders = () => {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${selectedOrder._id}/return`, {
+      const res = await fetch(`${API_URL}/api/orders/${selectedOrder._id}/return`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(returnForm)
@@ -456,3 +457,4 @@ const MyOrders = () => {
 };
 
 export default MyOrders;
+

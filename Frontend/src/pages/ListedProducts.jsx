@@ -1,3 +1,4 @@
+import API_URL from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import imageCompression from 'browser-image-compression';
@@ -25,12 +26,12 @@ const ProductForm = ({ initialData, onCancel, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRemovingBg, setIsRemovingBg] = useState(false);
   const [previewImage, setPreviewImage] = useState(
-    initialData?.imageUrl ? `http://localhost:5000${initialData.imageUrl}` : null
+    initialData?.imageUrl ? `${API_URL}${initialData.imageUrl}` : null
   );
 
   const categories = ['Running Shoes', 'Casual Shoes', 'Sports Shoes', 'Formal Shoes'];
   const sizes = ['6', '7', '8', '9', '10', '11', '12'];
-  const colors = ['Black', 'White', 'Blue', 'Green', 'Gray', 'Red', 'Orange'];
+  const colors = ['Black', 'White', 'Blue', 'Green', 'Gray', 'Red', 'Orange', 'Brown'];
 
   const handleAddVariant = () => {
     if (currentVariant.quantity < 1) { alert('Quantity must be at least 1'); return; }
@@ -68,7 +69,7 @@ const ProductForm = ({ initialData, onCancel, onSuccess }) => {
       if (!token) { window.location.href = '/admin/login'; return; }
       const bgData = new FormData();
       bgData.append('image', compressedFile);
-      const bgResponse = await fetch('http://localhost:5000/api/ai/remove-bg', {
+      const bgResponse = await fetch('${API_URL}/api/ai/remove-bg', {
         method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: bgData
       });
       if (bgResponse.status === 401) { localStorage.removeItem('adminToken'); window.location.href = '/admin/login'; return; }
@@ -92,7 +93,7 @@ const ProductForm = ({ initialData, onCancel, onSuccess }) => {
       else if (formData[key] !== null && formData[key] !== undefined) data.append(key, formData[key]);
     });
     try {
-      const url = initialData ? `http://localhost:5000/api/products/${initialData._id}` : 'http://localhost:5000/api/products';
+      const url = initialData ? `${API_URL}/api/products/${initialData._id}` : '${API_URL}/api/products';
       const method = initialData ? 'PUT' : 'POST';
       const response = await fetch(url, { method, body: data });
       if (response.ok) {
@@ -242,7 +243,7 @@ const ListedProducts = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
     else if (currentSkip === 0 && !isLoadMore) setLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/products?skip=${currentSkip}&limit=${currentLimit}`);
+      const res = await fetch(`${API_URL}/api/products?skip=${currentSkip}&limit=${currentLimit}`);
       if (res.ok) {
         const data = await res.json();
         // Since we updated productController.getAllProducts to return { products, totalCount, hasMore }
@@ -289,7 +290,7 @@ const ListedProducts = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
     if (!window.confirm('Delete this product?')) return;
     const token = localStorage.getItem('adminToken');
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const res = await fetch(`${API_URL}/api/products/${id}`, {
         method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setProducts(prev => prev.filter(p => p._id !== id));
@@ -347,7 +348,7 @@ const ListedProducts = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
                         <div className="flex items-center gap-4">
                           <div className="w-16 h-16 rounded-2xl overflow-hidden bg-background-main border border-border-accent shrink-0">
                             {product.imageUrl
-                              ? <img src={`http://localhost:5000${product.imageUrl}`} alt={product.name} className="w-full h-full object-cover" />
+                              ? <img src={`${API_URL}${product.imageUrl}`} alt={product.name} className="w-full h-full object-cover" />
                               : <div className="w-full h-full flex items-center justify-center text-xs text-text-muted">No Img</div>
                             }
                           </div>
@@ -435,3 +436,4 @@ const ListedProducts = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
 };
 
 export default ListedProducts;
+

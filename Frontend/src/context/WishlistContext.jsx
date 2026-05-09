@@ -1,3 +1,4 @@
+import API_URL from '../../config/api';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 
@@ -19,7 +20,7 @@ export const WishlistProvider = ({ children }) => {
   const mapProduct = (p) => ({
     id: p._id,
     name: p.name,
-    image: p.imageUrl?.startsWith('http') ? p.imageUrl : `http://localhost:5000${p.imageUrl}`,
+    image: p.imageUrl?.startsWith('http') ? p.imageUrl : `${API_URL}${p.imageUrl}`,
     price: p.price,
     discount: p.discount,
     gender: p.gender,
@@ -39,7 +40,7 @@ export const WishlistProvider = ({ children }) => {
       if (user) {
         setLoading(true);
         try {
-          const res = await fetch(`http://localhost:5000/api/users/${user.uid}/wishlist`);
+          const res = await fetch(`${API_URL}/api/users/${user.uid}/wishlist`);
           if (res.ok) {
             const data = await res.json();
             const mapped = Array.isArray(data) ? data.map(mapProduct) : [];
@@ -84,7 +85,7 @@ export const WishlistProvider = ({ children }) => {
 
     if (user) {
       try {
-        await fetch(`http://localhost:5000/api/users/${user.uid}/wishlist/add`, {
+        await fetch(`${API_URL}/api/users/${user.uid}/wishlist/add`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ productId: id }),
@@ -102,7 +103,7 @@ export const WishlistProvider = ({ children }) => {
 
     if (user) {
       try {
-        await fetch(`http://localhost:5000/api/users/${user.uid}/wishlist/remove/${productId}`, {
+        await fetch(`${API_URL}/api/users/${user.uid}/wishlist/remove/${productId}`, {
           method: 'DELETE',
         });
       } catch (err) {
@@ -133,3 +134,5 @@ export const useWishlist = () => {
   if (!context) throw new Error('useWishlist must be used within a WishlistProvider');
   return context;
 };
+
+

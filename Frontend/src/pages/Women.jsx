@@ -1,3 +1,4 @@
+import API_URL from '../config/api';
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter } from 'lucide-react';
@@ -22,7 +23,7 @@ const Women = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/products');
+        const response = await fetch('${API_URL}/api/products');
         if (!response.ok) throw new Error('Failed to fetch products');
         const data = await response.json();
         
@@ -30,7 +31,7 @@ const Women = () => {
         const mappedProducts = productArray.map(p => ({
           id: p._id,
           name: p.name,
-          image: `http://localhost:5000${p.imageUrl}`,
+          image: `${API_URL}${p.imageUrl}`,
           price: p.price,
           discount: p.discount,
           category: p.gender,
@@ -254,3 +255,4 @@ const Women = () => {
 };
 
 export default Women;
+

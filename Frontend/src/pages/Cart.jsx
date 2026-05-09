@@ -1,3 +1,4 @@
+import API_URL from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,7 +38,7 @@ const Cart = () => {
 
   const fetchAddresses = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/address?userId=${user.uid}`);
+      const response = await fetch(`${API_URL}/api/address?userId=${user.uid}`);
       const data = await response.json();
       setAddresses(data);
       // Auto-select default address if available
@@ -434,7 +435,7 @@ const Cart = () => {
                           paymentStatus: 'Pending'
                         };
 
-                        const response = await fetch('http://localhost:5000/api/orders', {
+                        const response = await fetch('${API_URL}/api/orders', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify(orderData)
@@ -450,7 +451,7 @@ const Cart = () => {
                      } else {
                         // --- ONLINE FLOW (RAZORPAY) ---
                         // 1. Create order on backend
-                        const orderRes = await fetch('http://localhost:5000/api/payments/create-order', {
+                        const orderRes = await fetch('${API_URL}/api/payments/create-order', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ amount: totalAmount })
@@ -467,7 +468,7 @@ const Cart = () => {
                           order_id: razorpayOrder.id,
                           handler: async (response) => {
                              // 3. Verify Payment
-                             const verifyRes = await fetch('http://localhost:5000/api/payments/verify-payment', {
+                             const verifyRes = await fetch('${API_URL}/api/payments/verify-payment', {
                                method: 'POST',
                                headers: { 'Content-Type': 'application/json' },
                                body: JSON.stringify(response)
@@ -494,7 +495,7 @@ const Cart = () => {
                                   razorpayPaymentId: response.razorpay_payment_id
                                 };
 
-                                const saveOrderRes = await fetch('http://localhost:5000/api/orders', {
+                                const saveOrderRes = await fetch('${API_URL}/api/orders', {
                                   method: 'POST',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify(orderData)
@@ -560,3 +561,4 @@ const Cart = () => {
 };
 
 export default Cart;
+

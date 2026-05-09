@@ -1,3 +1,4 @@
+import API_URL from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,6 +38,7 @@ const StatCard = ({ label, value, icon: Icon, trend, trendUp }) => (
 );
 
 const DashboardView = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -44,11 +46,14 @@ const DashboardView = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('adminToken');
-        const res = await fetch('http://localhost:5000/api/admin/stats', {
+        const res = await fetch('${API_URL}/api/admin/stats', {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
           setStats(await res.json());
+        } else if (res.status === 401) {
+          localStorage.removeItem('adminToken');
+          navigate('/admin/login');
         }
       } catch (err) {
         console.error('Stats fetch error:', err);
@@ -126,6 +131,7 @@ const DashboardView = () => {
 };
 
 const AllOrdersView = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -144,7 +150,7 @@ const AllOrdersView = () => {
       const token = localStorage.getItem('adminToken');
       const statusParam = status !== 'All' ? `&status=${status}` : '';
       const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
-      const res = await fetch(`http://localhost:5000/api/orders/admin?skip=${currentSkip}&limit=${currentLimit}${statusParam}${searchParam}`, {
+      const res = await fetch(`${API_URL}/api/orders/admin?skip=${currentSkip}&limit=${currentLimit}${statusParam}${searchParam}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -164,6 +170,9 @@ const AllOrdersView = () => {
           setOrders(data.orders);
         }
         setHasMore(data.hasMore);
+      } else if (res.status === 401) {
+        localStorage.removeItem('adminToken');
+        navigate('/admin/login');
       }
     } catch (error) {
       console.error('Fetch error:', error);
@@ -206,7 +215,7 @@ const AllOrdersView = () => {
   const updateStatus = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status: newStatus })
@@ -563,3 +572,4 @@ const AdminDashboard = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuO
 };
 
 export default AdminDashboard;
+

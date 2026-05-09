@@ -1,3 +1,4 @@
+import API_URL from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -96,7 +97,7 @@ const AddOffer = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuOpen: e
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const res   = await fetch('http://localhost:5000/api/offers/admin?type=offer', {
+      const res   = await fetch('${API_URL}/api/offers/admin?type=offer', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) setOffers(await res.json());
@@ -110,7 +111,7 @@ const AddOffer = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuOpen: e
     setSubmitting(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const res   = await fetch('http://localhost:5000/api/offers', {
+      const res   = await fetch('${API_URL}/api/offers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ ...form, type: 'offer' }),
@@ -127,7 +128,7 @@ const AddOffer = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuOpen: e
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this offer?')) return;
     const token = localStorage.getItem('adminToken');
-    const res   = await fetch(`http://localhost:5000/api/offers/${id}`, {
+    const res   = await fetch(`${API_URL}/api/offers/${id}`, {
       method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) setOffers(prev => prev.filter(o => o._id !== id));
@@ -288,3 +289,4 @@ const AddOffer = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuOpen: e
 };
 
 export default AddOffer;
+

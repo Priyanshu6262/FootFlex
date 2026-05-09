@@ -134,9 +134,20 @@ exports.getAllUsers = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 15;
     const skip = parseInt(req.query.skip) || 0;
+    const search = req.query.search || '';
 
-    const users = await User.find().skip(skip).limit(limit).sort({ createdAt: -1 });
-    const totalCount = await User.countDocuments();
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } }
+        ]
+      };
+    }
+
+    const users = await User.find(query).skip(skip).limit(limit).sort({ createdAt: -1 });
+    const totalCount = await User.countDocuments(query);
     
     // For each user, we need to calculate their orders
     const usersWithStats = await Promise.all(users.map(async (u) => {

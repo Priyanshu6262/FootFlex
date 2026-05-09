@@ -1,3 +1,4 @@
+import API_URL from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Eye, ShieldAlert, Users as UsersIcon, Search, Filter, X, ShoppingBag } from 'lucide-react';
@@ -17,18 +18,20 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Modal states
   const [selectedUserOrders, setSelectedUserOrders] = useState(null);
   const [ordersLoading, setOrdersLoading] = useState(false);
 
-  const fetchUsers = async (currentSkip = 0, currentLimit = 15, isLoadMore = false) => {
+  const fetchUsers = async (currentSkip = 0, currentLimit = 15, search = searchQuery, isLoadMore = false) => {
     if (isLoadMore) setLoadingMore(true);
     else if (currentSkip === 0 && !isLoadMore) setLoading(true);
 
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await fetch(`http://localhost:5000/api/admin/users?skip=${currentSkip}&limit=${currentLimit}`, {
+      const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
+      const res = await fetch(`${API_URL}/api/admin/users?skip=${currentSkip}&limit=${currentLimit}${searchParam}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -48,7 +51,10 @@ const Users = () => {
         }
         setHasMore(data.hasMore);
       } else {
-        if (res.status === 401) navigate('/admin/login');
+        if (res.status === 401) {
+          localStorage.removeItem('adminToken');
+          navigate('/admin/login');
+        }
       }
     } catch (err) {
       console.error('Fetch users error:', err);
@@ -61,14 +67,19 @@ const Users = () => {
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) { navigate('/admin/login'); return; }
-    fetchUsers(0, 15, false);
-  }, []);
+    
+    const timeoutId = setTimeout(() => {
+      fetchUsers(0, 15, searchQuery, false);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, navigate]);
 
   const handleShowMore = () => {
     if (!hasMore) return;
     const newSkip = users.length;
     const limit = newSkip === 15 ? 25 : 35;
-    fetchUsers(newSkip, limit, true);
+    fetchUsers(newSkip, limit, searchQuery, true);
   };
 
   const handleBlockToggle = async (userId, currentBlockedStatus) => {
@@ -76,7 +87,7 @@ const Users = () => {
     
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await fetch(`http://localhost:5000/api/admin/users/${userId}/block`, {
+      const res = await fetch(`${API_URL}/api/admin/users/${userId}/block`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -96,7 +107,7 @@ const Users = () => {
     setOrdersLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await fetch(`http://localhost:5000/api/admin/users/${user._id}/orders`, {
+      const res = await fetch(`${API_URL}/api/admin/users/${user._id}/orders`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -142,6 +153,8 @@ const Users = () => {
                 <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-primary transition-colors" />
                 <input 
                   type="text" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search users..." 
                   className="bg-background-card border border-border-accent rounded-2xl py-3 pl-12 pr-6 text-sm focus:outline-none focus:border-primary transition-all w-full md:w-64 text-white"
                 />
@@ -361,3 +374,4 @@ const Users = () => {
 };
 
 export default Users;
+

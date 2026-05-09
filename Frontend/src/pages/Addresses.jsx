@@ -1,3 +1,4 @@
+import API_URL from '../config/api';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Plus, Trash2, Edit2, CheckCircle2, Home, Briefcase, ChevronRight, X, Phone, User } from 'lucide-react';
@@ -26,7 +27,7 @@ const Addresses = () => {
 
   const fetchAddresses = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/address?userId=${user.uid}`);
+      const response = await fetch(`${API_URL}/api/address?userId=${user.uid}`);
       const data = await response.json();
       setAddresses(data);
     } catch (err) {
@@ -43,8 +44,8 @@ const Addresses = () => {
 
     try {
       const url = editingAddress 
-        ? `http://localhost:5000/api/address/${editingAddress._id}`
-        : 'http://localhost:5000/api/address';
+        ? `${API_URL}/api/address/${editingAddress._id}`
+        : '${API_URL}/api/address';
       
       const method = editingAddress ? 'PUT' : 'POST';
       
@@ -74,7 +75,7 @@ const Addresses = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this address?")) return;
     try {
-      await fetch(`http://localhost:5000/api/address/${id}`, { method: 'DELETE' });
+      await fetch(`${API_URL}/api/address/${id}`, { method: 'DELETE' });
       fetchAddresses();
     } catch (err) {
       console.error("Failed to delete address", err);
@@ -83,7 +84,7 @@ const Addresses = () => {
 
   const handleSetDefault = async (id) => {
     try {
-      await fetch(`http://localhost:5000/api/address/${id}`, {
+      await fetch(`${API_URL}/api/address/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isDefault: true })
@@ -285,3 +286,4 @@ const Addresses = () => {
 };
 
 export default Addresses;
+
