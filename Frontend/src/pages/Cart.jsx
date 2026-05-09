@@ -435,7 +435,7 @@ const Cart = () => {
                           paymentStatus: 'Pending'
                         };
 
-                        const response = await fetch('${API_URL}/api/orders', {
+                        const response = await fetch(`${API_URL}/api/orders`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify(orderData)
@@ -451,7 +451,7 @@ const Cart = () => {
                      } else {
                         // --- ONLINE FLOW (RAZORPAY) ---
                         // 1. Create order on backend
-                        const orderRes = await fetch('${API_URL}/api/payments/create-order', {
+                        const orderRes = await fetch(`${API_URL}/api/payments/create-order`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ amount: totalAmount })
@@ -468,7 +468,7 @@ const Cart = () => {
                           order_id: razorpayOrder.id,
                           handler: async (response) => {
                              // 3. Verify Payment
-                             const verifyRes = await fetch('${API_URL}/api/payments/verify-payment', {
+                             const verifyRes = await fetch(`${API_URL}/api/payments/verify-payment`, {
                                method: 'POST',
                                headers: { 'Content-Type': 'application/json' },
                                body: JSON.stringify(response)
@@ -495,7 +495,7 @@ const Cart = () => {
                                   razorpayPaymentId: response.razorpay_payment_id
                                 };
 
-                                const saveOrderRes = await fetch('${API_URL}/api/orders', {
+                                const saveOrderRes = await fetch(`${API_URL}/api/orders`, {
                                   method: 'POST',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify(orderData)

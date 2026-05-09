@@ -12,7 +12,7 @@ const NewProducts = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('${API_URL}/api/products');
+        const response = await fetch(`${API_URL}/api/products`);
         if (!response.ok) throw new Error('Failed to fetch');
         const data = await response.json();
         

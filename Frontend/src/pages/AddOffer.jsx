@@ -97,7 +97,7 @@ const AddOffer = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuOpen: e
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const res   = await fetch('${API_URL}/api/offers/admin?type=offer', {
+      const res   = await fetch(`${API_URL}/api/offers/admin?type=offer`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) setOffers(await res.json());
@@ -111,7 +111,7 @@ const AddOffer = ({ isMobileMenuOpen: externalMobileOpen, setIsMobileMenuOpen: e
     setSubmitting(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const res   = await fetch('${API_URL}/api/offers', {
+      const res   = await fetch(`${API_URL}/api/offers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ ...form, type: 'offer' }),

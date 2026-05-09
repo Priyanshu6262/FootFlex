@@ -64,7 +64,7 @@ const ProductDetails = () => {
         if (mappedProduct.colors && mappedProduct.colors.length > 0) setSelectedColor(mappedProduct.colors[0]);
 
         // Fetch similar products
-        const allRes = await fetch('${API_URL}/api/products');
+        const allRes = await fetch(`${API_URL}/api/products`);
         if (allRes.ok) {
            const allProducts = await allRes.json();
            const mappedSimilar = allProducts.map(sp => ({

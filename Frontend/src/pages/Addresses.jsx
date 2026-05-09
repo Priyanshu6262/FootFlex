@@ -45,7 +45,7 @@ const Addresses = () => {
     try {
       const url = editingAddress 
         ? `${API_URL}/api/address/${editingAddress._id}`
-        : '${API_URL}/api/address';
+        : `${API_URL}/api/address`;
       
       const method = editingAddress ? 'PUT' : 'POST';
       

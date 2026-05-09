@@ -69,7 +69,7 @@ const ProductForm = ({ initialData, onCancel, onSuccess }) => {
       if (!token) { window.location.href = '/admin/login'; return; }
       const bgData = new FormData();
       bgData.append('image', compressedFile);
-      const bgResponse = await fetch('${API_URL}/api/ai/remove-bg', {
+      const bgResponse = await fetch(`${API_URL}/api/ai/remove-bg`, {
         method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: bgData
       });
       if (bgResponse.status === 401) { localStorage.removeItem('adminToken'); window.location.href = '/admin/login'; return; }
@@ -93,7 +93,7 @@ const ProductForm = ({ initialData, onCancel, onSuccess }) => {
       else if (formData[key] !== null && formData[key] !== undefined) data.append(key, formData[key]);
     });
     try {
-      const url = initialData ? `${API_URL}/api/products/${initialData._id}` : '${API_URL}/api/products';
+      const url = initialData ? `${API_URL}/api/products/${initialData._id}` : `${API_URL}/api/products`;
       const method = initialData ? 'PUT' : 'POST';
       const response = await fetch(url, { method, body: data });
       if (response.ok) {
