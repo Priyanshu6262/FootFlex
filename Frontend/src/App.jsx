@@ -25,6 +25,7 @@ import { WishlistProvider } from './context/WishlistContext';
 import { ToastProvider } from './context/ToastContext';
 import ToastBridge from './components/ToastBridge';
 import AdminLayout from './components/AdminLayout';
+import ChatBot from './components/ChatBot';
 
 function App() {
   return (
@@ -66,6 +67,8 @@ function App() {
                       </Routes>
                     </main>
                     <Footer />
+                    {/* AI Chatbot — visible on all public pages */}
+                    <ChatBot />
                   </div>
                 } />
               </Routes>
