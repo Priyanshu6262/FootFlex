@@ -1,0 +1,24 @@
+{
+  "title": "FootFlex Product Warranty Policy & FAQs",
+  "category": "Warranty Policy",
+  "docType": "policy",
+  "content": "FootFlex provides a 30-day manufacturer warranty covering genuine manufacturing defects on all footwear purchases. Defects covered include sole detachment, upper stitching tears under normal usage, structural heel breakdown, or defective zippers/hardware. Warranty claims must be submitted to support@footflex.com along with invoice copy and photos of the defect. Upon inspection, FootFlex will provide a free replacement or store credit. Damage resulting from normal wear and tear, chemical exposure, animal damage, improper washing, or deliberate misuse is excluded from warranty coverage.",
+  "faqs": [
+    {
+      "question": "Do FootFlex shoes come with a warranty?",
+      "answer": "Yes! All FootFlex footwear carries a 30-day manufacturer warranty covering genuine manufacturing defects."
+    },
+    {
+      "question": "What is covered under the 30-day FootFlex warranty?",
+      "answer": "Covered defects include sole detachment, stitching failures, broken hardware, or structural defects occurring during normal wear."
+    },
+    {
+      "question": "What is excluded from the warranty?",
+      "answer": "Normal wear and tear, sole erosion from rough usage, accidental cuts, water/chemical damage, or improper washing are not covered."
+    },
+    {
+      "question": "How do I claim a warranty for a defective shoe?",
+      "answer": "Email support@footflex.com with your Order ID, proof of purchase, and clear photographs of the defect for immediate evaluation."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "title": "FootFlex Refund & Payment Refund Policy & FAQs",
+  "category": "Refund Policy",
+  "docType": "policy",
+  "content": "At FootFlex, refunds are processed promptly once returned footwear reaches our warehouse and passes quality inspection (usually within 24-48 hours of receipt). Approved refunds take 5 to 7 business days to reflect in your original payment method (Razorpay UPI, Credit Card, Debit Card, Net Banking, or Wallet). For Cash on Delivery (COD) orders, customers are requested to enter their Bank UPI ID or Account Number (Account Holder Name, IFSC Code, Account Number) in the 'My Orders' return portal; COD refunds are credited via direct NEFT/IMPS bank transfer within 3 to 5 business days post-inspection. Shipping fees paid on orders below ₹999 are non-refundable unless the return is due to a damaged or incorrect item sent by FootFlex.",
+  "faqs": [
+    {
+      "question": "How long does it take to receive a refund from FootFlex?",
+      "answer": "Refunds are processed within 5 to 7 business days after the returned product passes quality inspection at our warehouse."
+    },
+    {
+      "question": "How will I receive my refund for prepaid orders (UPI/Card/NetBanking)?",
+      "answer": "For prepaid orders processed via Razorpay, refunds are credited back directly to the original payment source (bank account, UPI VPA, or card)."
+    },
+    {
+      "question": "How are refunds handled for Cash on Delivery (COD) orders?",
+      "answer": "For COD orders, you will be prompted to provide your Bank Account details or UPI ID during the return request. The refund will be credited directly via NEFT/IMPS within 3-5 business days."
+    },
+    {
+      "question": "Will my shipping charges be refunded?",
+      "answer": "Standard shipping charges (₹49) are non-refundable unless the return was initiated due to a defective, damaged, or wrong item sent by FootFlex."
+    },
+    {
+      "question": "Where can I check my refund status?",
+      "answer": "You can check the live status of your return and refund in your user account under 'My Orders' > 'Return Status'."
+    }
+  ]
+}

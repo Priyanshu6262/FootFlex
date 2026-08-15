@@ -1,0 +1,28 @@
+{
+  "title": "FootFlex Return Policy & FAQs",
+  "category": "Return Policy",
+  "docType": "policy",
+  "content": "FootFlex offers a hassle-free 7-day return window starting from the official date of delivery. To qualify for a return, the footwear must be unused, unworn, unwashed, and in its original pristine condition with all original tags, box, and packaging intact. Customers can initiate a return directly from the 'My Orders' section in their user dashboard by selecting the order and clicking 'Request Return'. Once initiated, our logistics partner will schedule a doorstep pickup within 24 to 48 hours. Upon arrival at our warehouse, all returned footwear undergoes a quality inspection. Once approved, the refund or store credit will be processed automatically. Returned items with missing tags, visible scuffs, dirt, or signs of outdoor wear will be rejected and sent back to the customer.",
+  "faqs": [
+    {
+      "question": "What is the return window for FootFlex products?",
+      "answer": "FootFlex provides a 7-day return window from the day your order is delivered."
+    },
+    {
+      "question": "How do I request a return on FootFlex?",
+      "answer": "Go to 'My Orders' in your dashboard, select the specific order, click 'Request Return', select the reason, and confirm the pickup address."
+    },
+    {
+      "question": "What items are non-returnable?",
+      "answer": "Items that show signs of wear, shoes without original tags or shoebox, washed footwear, or products marked as Final Sale are non-returnable."
+    },
+    {
+      "question": "How long does courier pickup take after requesting a return?",
+      "answer": "Our courier partner will pick up the package from your address within 24 to 48 hours of requesting a return."
+    },
+    {
+      "question": "Is there any charge for returning a product?",
+      "answer": "Return pickup is completely FREE for all eligible items on FootFlex."
+    }
+  ]
+}

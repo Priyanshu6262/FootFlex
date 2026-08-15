@@ -1,0 +1,28 @@
+{
+  "title": "FootFlex Exchange Policy & FAQs",
+  "category": "Exchange Policy",
+  "docType": "policy",
+  "content": "FootFlex allows customers to exchange footwear for a different size or color within 7 days of delivery at no extra cost for the first exchange. If you need a larger or smaller size, simply go to 'My Orders', select the order, and choose 'Request Exchange'. Select your desired replacement size or color variant. If the requested size is in stock, our courier agent will deliver the new size and collect the old pair simultaneously (Doorstep Reverse & Forward Delivery) or pick up the old pair first. If the requested size is out of stock, you can opt for a full refund or FootFlex Store Credit. Items submitted for exchange must be unworn, unused, with original box and tags attached.",
+  "faqs": [
+    {
+      "question": "Can I exchange my shoes for a different size or color on FootFlex?",
+      "answer": "Yes! You can exchange your footwear for a different size or color variant within 7 days of delivery."
+    },
+    {
+      "question": "Are size exchanges free on FootFlex?",
+      "answer": "Yes, your first size/color exchange for an order is 100% free of charge."
+    },
+    {
+      "question": "How do I initiate a size exchange?",
+      "answer": "Navigate to 'My Orders', choose your order, click 'Request Exchange', pick your desired size or color, and submit your request."
+    },
+    {
+      "question": "What happens if my required size is out of stock for exchange?",
+      "answer": "If your preferred size is unavailable, you can choose to receive a full refund or Store Credit to pick any other item on FootFlex."
+    },
+    {
+      "question": "How many times can I exchange an order?",
+      "answer": "We offer 1 free exchange per item. Subsequent exchange requests for the same item may incur a nominal reverse shipping fee of ₹99."
+    }
+  ]
+}

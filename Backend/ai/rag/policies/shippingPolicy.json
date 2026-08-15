@@ -1,0 +1,32 @@
+{
+  "title": "FootFlex Delivery & Shipping Policy & FAQs",
+  "category": "Delivery Policy",
+  "docType": "policy",
+  "content": "FootFlex provides reliable delivery services across all India PIN codes through logistics partners including BlueDart, Delhivery, DTDC, and XpressBees. Standard Delivery takes 5 to 7 business days. Express Delivery takes 2 to 3 business days and is available in select metro cities. All orders with a subtotal of ₹999 or more qualify for FREE Standard Delivery. Orders under ₹999 incur a nominal shipping fee of ₹49. Orders are processed and dispatched from our warehouse within 24 hours of placement (excluding Sundays and national holidays). Tracking details and live courier tracking links are sent via SMS, WhatsApp, and Email immediately upon dispatch.",
+  "faqs": [
+    {
+      "question": "What are the delivery timelines for FootFlex orders?",
+      "answer": "Standard Delivery takes 5–7 business days. Express Delivery (available in select metro cities) takes 2–3 business days."
+    },
+    {
+      "question": "What is the shipping cost on FootFlex?",
+      "answer": "Shipping is FREE for all orders worth ₹999 and above. A standard delivery fee of ₹49 applies to orders under ₹999."
+    },
+    {
+      "question": "How do I track my order shipment?",
+      "answer": "You can track your order in real-time under 'My Orders' in your dashboard or by clicking the courier tracking link sent to your registered SMS/Email."
+    },
+    {
+      "question": "What courier partners does FootFlex use?",
+      "answer": "We partner with top-tier courier networks including BlueDart, Delhivery, DTDC, XpressBees, and Shadowfax."
+    },
+    {
+      "question": "Can I change my delivery address after placing an order?",
+      "answer": "Address modification is permitted within 2 hours of placing the order, provided the package has not been dispatched. Contact support@footflex.com immediately for assistance."
+    },
+    {
+      "question": "What should I do if my package arrives damaged or tampered?",
+      "answer": "Do not accept tampered packages from courier personnel. If accepted, take photo/video proof and contact support@footflex.com within 24 hours."
+    }
+  ]
+}

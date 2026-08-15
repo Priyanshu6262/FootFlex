@@ -1,0 +1,28 @@
+{
+  "title": "FootFlex Payment Policies & FAQs",
+  "category": "Payment Policy",
+  "docType": "policy",
+  "content": "FootFlex supports a comprehensive array of secure online and offline payment options powered by Razorpay Payment Gateway. Accepted payment channels include: 1) UPI Payment Apps (Google Pay, PhonePe, Paytm, BHIM, CRED), 2) Debit & Credit Cards (Visa, Mastercard, RuPay, Maestro, American Express), 3) Net Banking across 50+ leading Indian banks (HDFC, ICICI, SBI, Axis, Kotak, etc.), 4) Digital Wallets (Paytm, Mobikwik, Freecharge, Amazon Pay), 5) Cash on Delivery (COD) available for select pin codes with a verification OTP. All transactions on FootFlex use end-to-end 256-bit SSL encryption and comply strictly with PCI-DSS security standards. GST tax invoices are generated for every completed purchase.",
+  "faqs": [
+    {
+      "question": "What payment methods are accepted on FootFlex?",
+      "answer": "FootFlex accepts Razorpay UPI (GPay, PhonePe, Paytm), Credit/Debit Cards (Visa, Mastercard, RuPay), Net Banking (50+ banks), Digital Wallets, and Cash on Delivery (COD)."
+    },
+    {
+      "question": "Is paying on FootFlex safe and secure?",
+      "answer": "Yes! All transactions on FootFlex are processed via Razorpay's PCI-DSS Level 1 compliant gateway with 256-bit SSL encryption. We never store your CVV or sensitive card PIN numbers."
+    },
+    {
+      "question": "Is Cash on Delivery (COD) available on FootFlex?",
+      "answer": "Yes, COD is available for eligible orders. An OTP verification code sent to your mobile phone is required to confirm COD orders."
+    },
+    {
+      "question": "Can I get a GST Tax Invoice for my business purchase on FootFlex?",
+      "answer": "Yes, an official GST tax invoice is generated for every order and can be downloaded anytime from the 'My Orders' section."
+    },
+    {
+      "question": "What should I do if my payment gets declined during checkout?",
+      "answer": "Ensure your card/bank has enabled online transactions and international/domestic limits. If the issue persists, retry using UPI or Net Banking."
+    }
+  ]
+}

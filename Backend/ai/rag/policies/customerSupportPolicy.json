@@ -1,0 +1,28 @@
+{
+  "title": "FootFlex Service & Customer Support Policy & FAQs",
+  "category": "Customer Support Policy",
+  "docType": "policy",
+  "content": "FootFlex is dedicated to providing world-class customer service and resolution. Customers can reach our support team through multiple dedicated channels: 1) Official Email Support at support@footflex.com, 2) 24/7 FootFlex AI Assistant Chatbot available on our website and mobile platform, 3) Live Customer Care Representatives available Monday through Saturday from 10:00 AM to 6:00 PM IST. Our Service Level Agreement (SLA) guarantees a response within 24 hours for email support tickets. For unresolved complaints, customers can contact our designated Grievance Officer at grievance@footflex.com.",
+  "faqs": [
+    {
+      "question": "How can I contact FootFlex Customer Support?",
+      "answer": "You can reach us by emailing support@footflex.com or by interacting with our live FootFlex AI Assistant Chatbot on the website."
+    },
+    {
+      "question": "What are the customer support working hours?",
+      "answer": "Our live support team operates Monday through Saturday, from 10:00 AM to 6:00 PM IST. Our AI Chatbot is available 24/7."
+    },
+    {
+      "question": "What is the expected email response time (SLA)?",
+      "answer": "We respond to all customer email inquiries within 24 business hours."
+    },
+    {
+      "question": "How do I report a missing item, damaged product, or wrong shipment?",
+      "answer": "Send an email to support@footflex.com with your Order ID, clear unboxing photos/video, and a description of the issue within 48 hours of delivery."
+    },
+    {
+      "question": "Who is the Grievance Redressal Officer for FootFlex?",
+      "answer": "For escalated compliance or unresolved issues, email our Grievance Officer at grievance@footflex.com with your ticket reference number."
+    }
+  ]
+}

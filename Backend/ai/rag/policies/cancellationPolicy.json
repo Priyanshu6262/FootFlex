@@ -1,0 +1,24 @@
+{
+  "title": "FootFlex Order Cancellation Policy & FAQs",
+  "category": "Cancellation Policy",
+  "docType": "policy",
+  "content": "Orders placed on FootFlex can be cancelled within 24 hours of placement or anytime before the package is dispatched from our warehouse. To cancel an order, navigate to 'My Orders', select the active order, and click 'Cancel Order'. Once cancelled, an immediate automated refund is triggered for prepaid orders (crediting back in 3-5 business days). If the order has already been shipped, cancellation is no longer possible through the portal; you may refuse delivery when the courier arrives or accept the package and initiate a standard 7-day return.",
+  "faqs": [
+    {
+      "question": "Can I cancel my order after placing it on FootFlex?",
+      "answer": "Yes! You can cancel your order directly from 'My Orders' within 24 hours of placing it, as long as it has not been dispatched."
+    },
+    {
+      "question": "How quickly is a refund processed for a cancelled order?",
+      "answer": "For prepaid orders, the refund is initiated immediately upon cancellation and reflects in your payment source within 3 to 5 business days."
+    },
+    {
+      "question": "What if my order has already been shipped and I want to cancel?",
+      "answer": "If your order has been dispatched, you cannot cancel it online. Simply refuse delivery when the courier arrives, or accept it and request a return."
+    },
+    {
+      "question": "Is there any penalty or fee for cancelling an order on FootFlex?",
+      "answer": "No! Order cancellation prior to dispatch is completely free of charge with 100% full refund."
+    }
+  ]
+}

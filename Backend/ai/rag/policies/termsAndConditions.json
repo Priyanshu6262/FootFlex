@@ -1,0 +1,28 @@
+{
+  "title": "FootFlex Terms and Conditions of Use & FAQs",
+  "category": "Terms and Conditions",
+  "docType": "policy",
+  "content": "Welcome to FootFlex. By accessing or using the FootFlex website, mobile web applications, or services, you agree to be bound by these Terms and Conditions. 1) User Account: You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account. 2) Pricing & Product Representation: We strive for accurate product display, sizes, and pricing. In the event of a typographical or system pricing error, FootFlex reserves the right to cancel affected orders with full refund to the customer. 3) Intellectual Property: All content, logos, graphics, footwear designs, and software code are the exclusive property of FootFlex. 4) User Conduct: Unauthorized scrapers, bot attacks, fraudulent orders, or abusive language towards support staff are strictly prohibited. 5) Limitation of Liability: FootFlex shall not be liable for indirect, incidental, or consequential damages resulting from site usage. 6) Governing Law: These terms are governed by the laws of India, with exclusive jurisdiction in the courts of India.",
+  "faqs": [
+    {
+      "question": "What are the Terms and Conditions of using FootFlex?",
+      "answer": "By using FootFlex, you agree to our Terms of Use regarding account responsibility, accurate product pricing, intellectual property protection, and lawful website usage."
+    },
+    {
+      "question": "Does FootFlex reserve the right to cancel an order due to pricing errors?",
+      "answer": "Yes. If a technical error causes a product to display an incorrect price, FootFlex reserves the right to cancel the order and issue a full refund."
+    },
+    {
+      "question": "Who owns the images, graphics, and content on the FootFlex website?",
+      "answer": "All logos, graphics, images, product photos, trademarks, and code belong exclusively to FootFlex and are protected under Indian intellectual property laws."
+    },
+    {
+      "question": "What happens if a user engages in fraudulent activity or fake orders?",
+      "answer": "FootFlex reserves the right to immediately suspend or permanently terminate accounts engaging in fraudulent activities, fake return requests, or abuse."
+    },
+    {
+      "question": "Which legal jurisdiction governs FootFlex policies?",
+      "answer": "All policies and terms are governed by the laws of India and subject to jurisdiction of Indian courts."
+    }
+  ]
+}

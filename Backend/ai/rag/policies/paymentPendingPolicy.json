@@ -1,0 +1,28 @@
+{
+  "title": "FootFlex Payment Pending & Failed Payment Policy & FAQs",
+  "category": "Payment Pending Policy",
+  "docType": "policy",
+  "content": "If money has been debited from your bank account or UPI app (Google Pay, PhonePe, Paytm, etc.) but your order status on FootFlex displays 'Payment Pending', 'Processing', or 'Failed', please do not panic. This usually occurs due to temporary network glitches between your bank, UPI network, and Razorpay gateway. In 95% of cases, Razorpay automatically reconciles the transaction within 2 to 4 hours, and your order will automatically update to 'Placed'. If the transaction failed at the payment gateway level, the debited money is safely auto-reversed by your bank back to your account within 3 to 5 business days. You can also verify your Payment Reference ID or Razorpay Order ID under 'My Orders' or contact support@footflex.com with your payment receipt.",
+  "faqs": [
+    {
+      "question": "Money was deducted from my account, but my order shows Pending or Payment Failed. What should I do?",
+      "answer": "Wait 2 to 4 hours as Razorpay automatically reconciles pending transactions. If your order status does not update to 'Placed' within 4 hours, your bank will auto-reverse the money back to your account within 3-5 business days."
+    },
+    {
+      "question": "How long does a stuck or pending payment take to refund back to my bank account?",
+      "answer": "If a pending transaction is marked failed, your bank automatically credits the funds back to your UPI/card/account within 3 to 5 working days."
+    },
+    {
+      "question": "How can I verify if my pending payment was received by FootFlex?",
+      "answer": "Go to 'My Orders' and check the order status. If it says 'Placed', payment was successful. If it remains 'Pending', email support@footflex.com with your UTR/UPI Transaction ID."
+    },
+    {
+      "question": "Will I be charged twice if I place a new order after a failed payment?",
+      "answer": "No. Each order attempt generates a unique Razorpay Transaction ID. If the first transaction failed, the money for the first attempt will be fully auto-reversed."
+    },
+    {
+      "question": "What information should I provide to customer support for a pending payment issue?",
+      "answer": "Please provide your registered Email/Phone, Payment Date/Time, Amount, and Bank UTR/UPI Transaction ID when reaching out to support@footflex.com."
+    }
+  ]
+}
